@@ -1,0 +1,42 @@
+<?xml version="1.0"?>  
+<design version="1.0">  
+   <namespaces>  
+     <namespace prefix="st" uri="http://www.missiongroup.com.cn/2012/flex4"/>  
+   </namespaces>  
+  
+   <categories>  
+       <category id="components" label="struts" defaultExpand="true"/>  
+   </categories>  
+      
+   <components>  
+        <component id="com.struts.components.MenuTree"  
+                   name="com.struts.components.MenuTree"   
+                   namespace="st"   
+                   category="components">  
+        </component>  
+        
+        <component id="com.struts.components.Window"  
+                   name="com.struts.components.Window"   
+                   namespace="st"   
+                   category="components">  
+        </component> 
+        
+        <component id="com.struts.WebSite"  
+                   name="com.struts.WebSite"   
+                   namespace="st"   
+                   category="components">  
+        </component> 
+        
+        
+        <component id="com.struts.components.ViewGroup"  
+                   name="com.struts.components.ViewGroup"   
+                   namespace="st"   
+                   category="components">  
+        </component> 
+   </components>  
+</design>  
+
+
+
+
+

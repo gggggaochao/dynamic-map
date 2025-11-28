@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="20" 
+		 horizontalCenter="0">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.core.IVisualElement;
+			
+			//private var _userLines : Array;
+
+
+			private var _userLines : Array;
+			
+			private var _isUp : Boolean;
+			
+			private var _offsetY : Number = 20;
+
+			public function get userLines():Array
+			{
+				return _userLines;
+			}
+
+			public function set userLines(value:Array):void
+			{
+				_userLines = value;
+			}
+
+			public function set isUp(value:Boolean):void
+			{
+				_isUp    = value;
+				_offsetY = _isUp ? -16 : 16;
+				
+			}
+
+			
+			private var _midHeight : Number = 0;
+			
+			private var _prototypeChanged : Boolean;
+
+			public function set midHeight(value:Number):void
+			{
+				
+				if(_midHeight != value)
+				{
+				   _midHeight = value;
+				   _prototypeChanged = true;
+				   
+				   _startY  = _isUp ? (_midHeight + _offsetY - 10) : _midHeight + _offsetY;
+				   
+				   invalidateProperties()
+				}
+			}
+
+			
+			private var _startY : Number = 0;
+	
+			protected override function commitProperties(): void
+			{
+				super.commitProperties();
+				
+				if(_prototypeChanged)
+				{
+					_prototypeChanged = false;
+					
+					var _y : Number = _startY;
+					var count : int = _userLines.length;
+					var ele : IVisualElement;
+					for (var i:int = 0;i<count;i++)
+					{
+						ele = _userLines[i] as IVisualElement;
+						ele.y = _y;
+						_y = _y + _offsetY;
+					}
+				}
+			}
+			
+			protected override function createChildren():void
+			{
+				super.createChildren();
+				
+				var count : int = _userLines.length;
+				var ele : IVisualElement;
+				
+				for (var i:int = 0;i<count;i++)
+				{
+					ele = _userLines[i] as IVisualElement;
+					addElement(ele);
+				}				
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:Rect top="0" bottom="0" left="0" right="0">
+		<s:fill>
+			<s:SolidColor color="0" />
+		</s:fill>
+	</s:Rect>
+	
+</s:Group>
+
+
+
+
+
+
+
+

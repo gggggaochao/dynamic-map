@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="com.missiongroup.car.views.Lineview5"/>
+    <classEntry path="com.missiongroup.car.skins.LeftEndStationRenderSkin"/>
+    <classEntry path="com.missiongroup.car.messages.Logtmp"/>
+  </includeClasses>
+  <includeResources>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_1_01.png" sourcePath="assets/images/lines/arrowhead_line4_1_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_2_3_01.png" sourcePath="assets/images/lines/arrowhead_line4_2_3_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_10_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_10_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_11_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_11_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_11_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_11_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_2_4_01.png" sourcePath="assets/images/lines/arrowhead_line3_2_4_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_8_01.png" sourcePath="assets/images/lines/arrowhead_line3_8_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_6_02.png" sourcePath="assets/images/lines/arrowhead_line4_6_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_9_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_9_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_1_4_01.png" sourcePath="assets/images/lines/arrowhead_line3_1_4_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_7_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_7_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_6_01.png" sourcePath="assets/images/lines/arrowhead_line4_6_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_1_3_02.png" sourcePath="assets/images/lines/arrowhead_line4_1_3_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_8_02.png" sourcePath="assets/images/lines/arrowhead_line3_8_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_2_6_9_01.png" sourcePath="assets/images/lines/arrowhead_line4_2_6_9_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_7_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_7_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_2_3_02.png" sourcePath="assets/images/lines/arrowhead_line4_2_3_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_10_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_10_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_1_02.png" sourcePath="assets/images/lines/arrowhead_line3_1_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_8_01.png" sourcePath="assets/images/lines/arrowhead_line4_8_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_1_3_01.png" sourcePath="assets/images/lines/arrowhead_line4_1_3_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_7_01.png" sourcePath="assets/images/lines/arrowhead_line4_7_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_9_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_9_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_1_4_02.png" sourcePath="assets/images/lines/arrowhead_line3_1_4_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_12_02.png" sourcePath="assets/images/lines/arrowhead_line4_12_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_9_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_9_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_10_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_10_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_13_02.png" sourcePath="assets/images/lines/arrowhead_line4_3_13_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_7_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_7_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_13_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_13_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_12_01.png" sourcePath="assets/images/lines/arrowhead_line4_12_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_10_02.png" sourcePath="assets/images/lines/arrowhead_line4_10_02.png"/>
+    <resourceEntry destPath="css/index.css" sourcePath="css/index.css"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_7_02.png" sourcePath="assets/images/lines/arrowhead_line4_7_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_13_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_13_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_1_02.png" sourcePath="assets/images/lines/arrowhead_line4_1_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_7_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_7_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_11_01.png" sourcePath="assets/images/lines/arrowhead_line3_4_11_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_3_10_01.png" sourcePath="assets/images/lines/arrowhead_line4_3_10_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_9_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_9_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_8_02.png" sourcePath="assets/images/lines/arrowhead_line4_8_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_2_4_02.png" sourcePath="assets/images/lines/arrowhead_line3_2_4_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_13_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_13_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_4_11_02.png" sourcePath="assets/images/lines/arrowhead_line3_4_11_02.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line3_1_01.png" sourcePath="assets/images/lines/arrowhead_line3_1_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_10_01.png" sourcePath="assets/images/lines/arrowhead_line4_10_01.png"/>
+    <resourceEntry destPath="assets/images/lines/arrowhead_line4_2_6_9_02.png" sourcePath="assets/images/lines/arrowhead_line4_2_6_9_02.png"/>
+  </includeResources>
+  <namespaceManifests/>
+</flexLibProperties>

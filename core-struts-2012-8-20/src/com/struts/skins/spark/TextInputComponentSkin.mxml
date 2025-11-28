@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+MissionGroup Copyright 2012 All Rights Reserved.
+NOTICE: MIT MissionGroup permits you to use, modify, and distribute this file
+in accordance with the terms of the license agreement accompanying it.
+-->
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:fb="http://ns.adobe.com/flashbuilder/2009" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.struts.components.TextInputComponent")]
+	</fx:Metadata>
+	
+	<fx:Script fb:purpose="styling">
+		<![CDATA[         
+			/**
+			 *  @private
+			 */
+			
+			private var bgFillSource : *;
+			
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+			{
+				var styleValue : * = getStyle("backgroundImage");
+				
+				if(styleValue && bgFillSource!= styleValue)
+				{
+					bgFill.source = bgFillSource = styleValue;
+				}
+				
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+			}
+		]]>        
+	</fx:Script>
+
+	<!-- SkinParts
+	name=textDisplay, type=spark.components.RichEditableText, required=true
+	name=labelDisplay, type=spark.components.Label, required=false
+	-->
+	
+	<s:Rect left="0" top="0" right="0" bottom="0">
+		<s:fill>
+			<s:BitmapFill id="bgFill"/>
+		</s:fill>
+	</s:Rect>
+
+	<s:RichEditableText id="textDisplay"
+						verticalAlign="middle"
+						widthInChars="20" 
+						selectable="false" editable="false" focusEnabled="false"
+						left="1" right="1" top="1" bottom="1"/>
+</s:Skin>
+

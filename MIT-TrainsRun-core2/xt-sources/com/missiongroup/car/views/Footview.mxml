@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="1280" height="26" clipAndEnableScrolling="true" 
+		 right="0">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private var _valueBy : Number = 1;
+			
+			private var _text : String;
+			
+			private var _textChanged : Boolean;
+			
+			private var _textLength : Number = 0;
+
+			public function set text(value:String):void
+			{
+				if(_text != value)
+				{
+					_text = value;
+					_textChanged = true;
+					_textLength = value.length * 18;
+					
+					invalidateProperties();
+				}
+			}
+			
+			protected override function commitProperties(): void
+			{
+				super.commitProperties();
+				
+				if(_textChanged)
+				{
+					_textChanged = false;
+					
+					move_up.end();
+					
+					moveText.text = _text;
+					moveText.x = width;
+					move_up.xTo = -_textLength;
+					move_up.duration = 1000 * _text.length;
+					move_up.play();
+					
+				}
+			}
+			
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<mx:Move id="move_up" target="{moveText}" repeatCount="0"/>
+	</fx:Declarations>
+	
+	
+	<s:Label id="moveText"  fontSize="18" color="0xffffff" verticalCenter="2"/>
+</s:Group>

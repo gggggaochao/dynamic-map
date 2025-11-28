@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Metadata>
+		[HostComponent("spark.components.Button")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+			{
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+				
+				
+				
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="up"/>
+		<s:State name="over"/>
+		<s:State name="down"/>
+		<s:State name="disabled"/>
+	</s:states>
+
+	<s:Group width="12" height="12">
+		<s:Rect left="0" top="0" right="0" bottom="0">
+			<s:fill>
+				<s:SolidColor color="0xCB5148" 
+							  alpha.over="1" 
+							  alpha="0"/>
+			</s:fill>
+		</s:Rect>
+		
+		<s:Path data="M 2 2 L 8 8 M 8 2 L 2 8" horizontalCenter="0" verticalCenter="0" >
+			<s:stroke>
+				<s:SolidColorStroke color="{getStyle('color')}" 
+									weight="2" 
+									color.over="0xFFFFFF"
+									scaleMode="none"/>			
+			</s:stroke>
+		</s:Path>
+	</s:Group>	
+
+	
+</s:SparkSkin>

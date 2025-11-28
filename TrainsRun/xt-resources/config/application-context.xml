@@ -1,0 +1,220 @@
+<?xml version="1.0" ?>
+<beans>
+
+	<bean id="setting" class="com.missiongroup.car.core.AppSetting">
+		
+		<property name="City" value="宁波"></property>	
+		
+		<!-- 服务器   Socket 通信配置 -->  
+		<property name="ServiceAddress" value="192.168.7.11"/>
+		<property name="ServicePort" value="20001"/>
+		
+		<!-- 清空线路等待时间 -->  
+		<property name="ClearWaitTime" value="2000"></property>
+		<property name="IsAutoConnect" value="true"></property>
+		<property name="KeepHeartBeatTimes" value="5"></property>	
+		
+		<!-- 文件服务器路径配置 --> 		
+		<property name="FileLoadUrl" value="http://10.0.10.102/iPis3/UpdateFiles/"/>
+		
+	
+		<!-- 车站ID  -->  
+		<property name="StationId" value="1"></property>
+		
+		<!-- 线路编号  -->
+		<property name="LineNum" value="4"></property>
+		
+		<!-- 上行屏幕坐标  -->
+		<property name="LineUpX" value="0"></property>
+		<property name="LineUpY" value="0"></property>
+		
+		<!-- 下行屏幕坐标 -->
+		<property name="LineDownX" value="1366"></property>
+		<property name="LineDownY" value="0"></property>
+		  
+		  
+		<!-- 下行屏幕坐标  
+		<property name="LineDownX" value="0"></property>
+		<property name="LineDownY" value="256"></property>
+		-->
+		<!-- 
+			4线路配置  
+			<property name="LineNum" value="4"></property>
+			<property name="LineDir" value="Up"></property>
+			<property name="stationWidth" value="70"></property>
+			<property name="stationHeight" value="55"></property>		
+			<property name="mapLeftAndRight" value="160"></property>		
+		-->
+		
+		<!-- 
+		    3号线配置
+			<property name="LineNum" value="3"></property>
+			<property name="LineDir" value="Up"></property>
+			<property name="stationWidth" value="36"></property>
+			<property name="stationHeight" value="70"></property>	
+			<property name="mapLeftAndRight" value="20"></property>			
+		 -->
+		 
+		
+			
+		
+		<!-- 线路标准色  -->
+		<property name="LineColors">
+		   <HashTable>
+				<uint key="1" value="0xE61B23"/>
+				<uint key="2" value="0x89C540"/>
+				<uint key="3" value="0xFEEF41"/>
+				<uint key="4" value="0x4F2E8B"/>
+				<uint key="5" value="0x9056A3"/>
+				<uint key="6" value="0xD61771"/>	
+				<uint key="7" value="0xF37121"/>
+				<uint key="8" value="0x009CD8"/>
+				<uint key="9" value="0x7AC7EA"/>	
+				<uint key="10" value="0xBCA8D1"/>
+				<uint key="11" value="0x7E2231"/>
+				<uint key="13" value="0xE795C0"/>		   
+		   </HashTable>
+		</property>	
+	</bean>
+	
+	<bean id="config" class="HashTable">
+	    <Number key="wait" value="700"/>
+	    <String key="systemType" value="M1"/>	
+		<String key="rollText" value="请勿携带易燃易爆物品    请勿在车厢中吸烟"/>		
+	</bean>
+	
+	
+	<!-- 站点编号和发送的功能码之间的对应关系 规则 ：线路号+车站号，然后对应到实际的站点id，若车站号小于9则前面加0 -->
+	<bean id="stationsMap" class="HashTable">
+	
+		<!-- 线路号为5时(下行)，4号线预到站和到达站显示站点 -->
+		<String key="4_2_down_01" value="1000128"/>
+		<String key="4_2_down_02" value="1000025"/>
+		<String key="4_2_down_03" value="1000024"/>
+		<String key="4_2_down_04" value="1000023"/>
+		<String key="4_2_down_05" value="10000221"/>
+		<String key="4_2_down_06" value="1000021"/>
+		<String key="4_2_down_07" value="1000020"/>
+		<String key="4_2_down_08" value="1000019"/>
+		<String key="4_2_down_09" value="1000018"/>
+		<String key="4_2_down_10" value="1000017"/>
+		<String key="4_2_down_11" value="1000016"/>
+		<String key="4_2_down_12" value="1000015"/>
+		<String key="4_2_down_13" value="1000138"/>
+		<String key="4_2_down_14" value="1000013"/>
+		<String key="4_2_down_15" value="1000105"/>
+		<String key="4_2_down_16" value="1000104"/>
+		<String key="4_2_down_17" value="1000103"/>
+		<String key="4_2_down_18" value="1000102"/>
+		<String key="4_2_down_19" value="1000101"/>
+		<String key="4_2_down_20" value="1000145"/>
+		<String key="4_2_down_21" value="1000109"/>
+		<String key="4_2_down_22" value="1000108"/>
+		<String key="4_2_down_23" value="1000107"/>
+		<String key="4_2_down_24" value="1000106"/>
+		<String key="4_2_down_25" value="1000076"/>
+		<String key="4_2_down_26" value="1000141"/>
+		<String key="4_2_down_27" value="1000142"/>
+		<String key="4_2_down_28" value="1000060"/>
+		<String key="4_2_down_29" value="1000143"/>
+		<String key="4_2_down_30" value="1000144"/>
+		<String key="4_2_down_31" value="1000022"/>
+	
+		<!-- 线路号为5时(上行)，4号线预到站和到达站显示站点 -->
+		<String key="4_2_up_01" value="1000128"/>
+		<String key="4_2_up_02" value="1000025"/>
+		<String key="4_2_up_03" value="1000024"/>
+		<String key="4_2_up_04" value="1000023"/>
+		<String key="4_2_up_05" value="1000022"/>
+		<String key="4_2_up_06" value="1000021"/>
+		<String key="4_2_up_07" value="1000020"/>
+		<String key="4_2_up_08" value="1000019"/>
+		<String key="4_2_up_9" value="1000018"/>
+		<String key="4_2_up_10" value="1000017"/>
+		<String key="4_2_up_11" value="1000016"/>
+		<String key="4_2_up_12" value="1000015"/>
+		<String key="4_2_up_13" value="1000138"/>
+		<String key="4_2_up_14" value="1000013"/>
+		<String key="4_2_up_15" value="1000105"/>
+		<String key="4_2_up_16" value="1000104"/>
+		<String key="4_2_up_17" value="1000103"/>
+		<String key="4_2_up_18" value="1000102"/>
+		<String key="4_2_up_19" value="1000101"/>
+		<String key="4_2_up_20" value="1000145"/>
+		<String key="4_2_up_21" value="1000109"/>
+		<String key="4_2_up_22" value="1000108"/>
+		<String key="4_2_up_23" value="1000107"/>
+		<String key="4_2_up_24" value="1000106"/>
+		<String key="4_2_up_25" value="1000076"/>
+		<String key="4_2_up_26" value="1000141"/>
+		<String key="4_2_up_27" value="1000142"/>
+		<String key="4_2_up_28" value="1000060"/>
+		<String key="4_2_up_29" value="1000143"/>
+		<String key="4_2_up_30" value="1000144"/>
+	
+		<String key="401" value="1000022"/>
+		<String key="402" value="1000021"/>
+		<String key="403" value="1000020"/>
+		<String key="404" value="1000019"/>
+		<String key="405" value="1000018"/>
+		<String key="406" value="1000017"/>
+		<String key="407" value="1000016"/>
+		<String key="408" value="1000015"/>
+		<String key="409" value="1000138"/>
+		<String key="410" value="1000013"/>
+		<String key="411" value="1000105"/>
+		<String key="412" value="1000104"/>
+		<String key="413" value="1000103"/>
+		<String key="414" value="1000102"/>
+		<String key="415" value="1000101"/>
+		<String key="416" value="1000145"/>
+		<String key="417" value="1000109"/>
+		<String key="418" value="1000108"/>
+		<String key="419" value="1000107"/>
+		<String key="420" value="1000106"/>
+		<String key="421" value="1000076"/>
+		<String key="422" value="1000141"/>
+		<String key="423" value="1000142"/>
+		<String key="424" value="1000060"/>
+		<String key="425" value="1000143"/>
+		<String key="426" value="1000144"/>
+		 		
+		<String key="301" value="1000128"/>
+		<String key="302" value="1000025"/>
+		<String key="303" value="1000024"/>
+		<String key="304" value="1000023"/>
+		<String key="305" value="1000022"/>
+		<String key="306" value="1000021"/>
+		<String key="307" value="1000020"/>
+		<String key="308" value="1000019"/>
+		<String key="309" value="1000018"/>
+		<String key="310" value="1000017"/>
+		<String key="311" value="1000016"/>
+		<String key="312" value="1000015"/>
+		<String key="313" value="1000138"/>
+		<String key="314" value="1000013"/>
+		<String key="315" value="1000012"/>
+		<String key="316" value="1000149"/>
+		<String key="317" value="1000003"/>
+		<String key="318" value="1000004"/>
+		<String key="319" value="1000005"/>
+		<String key="320" value="1000006"/>
+		<String key="321" value="1000007"/>
+		<String key="322" value="1000140"/>
+		<String key="323" value="1000008"/>
+		<String key="324" value="1000009"/>
+		<String key="325" value="1000010"/>
+		<String key="326" value="1000011"/>
+		<String key="327" value="1000001"/>
+		<String key="328" value="1000139"/>
+		<String key="329" value="1000000"/>
+		
+	</bean>
+	
+</beans>
+
+
+
+
+
+

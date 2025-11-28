@@ -1,0 +1,66 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace st "http://www.missiongroup.com.cn/2012/flex4";
+@namespace core "com.missiongroup.car.core.*";
+@namespace views "com.missiongroup.car.views.*";
+
+@font-face
+{
+	fontFamily:font_en;
+	src:url("assets/fonts/SourceHanSansCN-Normal.otf");
+}  
+
+
+global
+{
+	content-background-alpha: 0.0;
+	fontFamily : font_en;
+	
+}
+
+s|Application
+{
+	fontFamily : font_en;
+	
+}
+
+.userLine {
+	fontSize:14px;
+}
+
+
+.sDisplay {
+	fontSize:16px;
+	color:#000000;
+	
+}
+
+.sDisplayPass {
+	fontSize:16px;
+	color:#8a8a8a;
+}
+
+.sDisplayNext {
+	fontSize:12px;
+	color:#046eb5;
+}
+
+
+
+.sDisplayE {
+	fontSize:10px;
+	color:#000000;
+	
+}
+
+.sDisplayPassE {
+	fontSize:12px;
+	color:#8a8a8a;
+}
+
+.sDisplayNextE {
+	fontSize:12px;
+	color:#046eb5;
+}
+

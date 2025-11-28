@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 implements="mx.core.IDataRenderer">
+	
+	<fx:Script>
+		<![CDATA[
+			
+			/**
+			 * 暂未发现调用到这个类！
+			 */
+			
+			
+			import com.missiongroup.car.consts.DisplayMode;
+			import com.missiongroup.metro.core.AppCache;
+			import com.missiongroup.metro.entities.TrainLine;
+			import com.missiongroup.metro.entities.TrainStation;
+			
+			import mx.events.FlexEvent;
+			
+			import spark.filters.GlowFilter;
+			
+			import assets.Assets;
+			
+		
+			private var icons : Array;
+			
+			public var userLines : Array;
+			
+			
+			[Bindable]
+			public var isLast : Boolean = false;
+			
+			private var _index : int;
+			
+			public function get index():int
+			{
+				return _index;
+			}
+
+			public function set index(value:int):void
+			{
+				
+				if(_index != value)
+				{
+					_index = value;
+					_protypeChange = true;
+					
+					invalidateProperties();
+				}
+			}
+
+			private var _trainStation : TrainStation;
+
+			private var _protypeChange : Boolean;
+			
+			public function get trainStation():TrainStation
+			{
+				return _trainStation;
+			}
+
+			public function set trainStation(value:TrainStation):void
+			{
+				if(_trainStation != value)
+				{
+					_trainStation = value;
+					_protypeChange = true;
+					
+					invalidateProperties();
+				}
+			}
+			
+			private var _displayMode : String;
+			
+			private var _displayModeChanged : Boolean;
+
+			public function get displayMode():String
+			{
+				return _displayMode;
+			}
+
+			public function set displayMode(value:String):void
+			{
+				if(_displayMode != value)
+				{
+					_displayMode = value;
+					_displayModeChanged = true;
+					
+					invalidateProperties();
+				}
+			}
+			
+			private var isUp : Boolean;
+			
+			private var transferRenderer : TransferLineRenderer;
+			
+			protected override function commitProperties(): void
+			{
+				super.commitProperties();
+				
+				if(_protypeChange)
+				{
+					_protypeChange = false;
+					
+					
+					isUp = index % 2 != 0; 
+					
+					var _midHeight : Number = this.height / 2;
+					
+					stationDisplay.verticalCenter    =  isUp ? (_midHeight - 8) : -_midHeight;
+					stationDisplay.text = _trainStation.Name;
+					
+//					var arrowIconOffsetY : Number = 0;
+//					
+//					if(index == 0 || isLast)
+//					{
+//						group.width = 24;
+//						arrowIconOffsetY = 2;
+//					}
+					
+					if(userLines)
+					{
+//						var arrowCenter : Number = isUp ? -12 - arrowIconOffsetY : 5 + arrowIconOffsetY;
+//						
+//						arrowIcon.verticalCenter = arrowCenter;
+						
+						transferRenderer = new TransferLineRenderer();
+
+						transferRenderer.includeInLayout = false;
+						transferRenderer.userLines = userLines;
+						transferRenderer.isUp = isUp;
+						
+						group.addElement(transferRenderer);
+					}
+					
+				}
+				
+				
+				
+				
+				if(_displayModeChanged)
+				{
+					_displayModeChanged = false;
+	
+					if(index == 0 || isLast)
+					{
+						group.width = 24;	
+					}
+					
+					if(_displayMode == DisplayMode.NEXT)
+					{
+						group.width = 40;
+					}
+					
+					var arrowIconOffsetY : Number = (group.width - 20) / 2;
+					var arrowCenter : Number = isUp ? -12 - arrowIconOffsetY : 5 + arrowIconOffsetY;
+					
+					arrowIcon.verticalCenter = arrowCenter;
+					
+					if(transferRenderer)
+					{
+						transferRenderer.x = (group.width - transferRenderer.width) / 2;
+						transferRenderer.midHeight = _midHeight + arrowCenter;
+					}
+					
+					switch(_displayMode)
+					{
+						case DisplayMode.PASS : 
+						{
+							stationIcon.source = (index == 0 || isLast) ? Assets.Icon_Pass24 : Assets.Icon_Pass20;
+							stationLineIcon.source = Assets.Line_Pass_R;
+							
+							if(userLines)
+							{
+								arrowIcon.source = isUp ? Assets.Arraw_Pass_Up : Assets.Arraw_Pass_Down;
+							}
+							break;
+						}
+						case DisplayMode.NEXT : 
+						{
+							myFilter.play();
+							
+							stationIcon.source = Assets.Icon_Now40;
+							stationLineIcon.source = Assets.Line_Normal_R;
+							
+							if(userLines)
+							{
+								arrowIcon.source = isUp ? Assets.Arraw_Now_Up : Assets.Arraw_Now_Down;
+							}
+							break;
+						}
+						default :
+						{
+							stationIcon.source = (index == 0 || isLast) ? Assets.Icon_Normal24 : Assets.Icon_Normal20;
+							stationLineIcon.source = Assets.Line_Normal_R;
+							
+							if(userLines)
+							{
+								arrowIcon.source = isUp ? Assets.Arraw_Normal_Up : Assets.Arraw_Normal_Down;
+							}
+						}
+					}
+					
+					
+				}
+				
+				
+			}
+			
+			public function get data():Object
+			{
+				return _trainStation;
+			}
+			
+			public function set data(value:Object):void
+			{
+				if(value is TrainStation)
+				{
+					trainStation = TrainStation(value);
+				}
+			}
+			
+			public function playEffect():void{
+				myFilter.play();
+			}
+			
+			public function stopEffect():void{
+				myFilter.stop();
+			}
+			
+			
+			private function fadeEffectEndHandler() : void
+			{
+				myFilter.alphaFrom = myFilter.alphaFrom == 0.3 ? 1 : 0.3;
+				myFilter.alphaTo = myFilter.alphaTo == 1 ? 0.3 : 1;
+				myFilter.play();
+				
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!--
+		<s:AnimateFilter id="myFilter" 
+						 repeatCount="0"
+						 duration="500" 
+						 target="{stationIcon}"
+						 repeatBehavior="reverse"
+						 bitmapFilter="{new spark.filters.GlowFilter()}" 
+						 effectEnd="myFilter.play()">
+			<s:SimpleMotionPath property="color" valueFrom="0xFFFFFF" valueTo="0xFFFFFF"/>
+			<s:SimpleMotionPath property="blurX" valueFrom="5" valueTo="40"/>
+			<s:SimpleMotionPath property="blurY" valueFrom="5" valueTo="40"/>
+			<s:SimpleMotionPath property="strength" valueFrom="1" valueTo="3"/>
+			<s:SimpleMotionPath property="alpha" valueFrom="1" valueTo="0.5"/>
+		</s:AnimateFilter>
+		-->
+		
+		<s:Fade id="myFilter" 
+				effectEnd="fadeEffectEndHandler()" 
+				target="{stationIcon}" 
+				alphaTo="1" alphaFrom="0.3" />
+	</fx:Declarations>	
+
+	
+	
+	<s:Group id="group" width="20" top="0" bottom="0">
+		
+		<s:Label id="stationDisplay" 
+				 horizontalCenter="0" verticalCenter="0"
+				 color="0xFFFFFF" />
+		
+		<s:BitmapImage id="arrowIcon" 
+					   horizontalCenter="0" />
+		
+	</s:Group>
+	
+	<s:HGroup top="0" bottom="0" left="0" right="0"
+			  verticalAlign="middle"
+			  gap="2">
+		
+		<s:BitmapImage id="stationIcon" 
+					   smooth="true" />
+		
+		<s:BitmapImage id="stationLineIcon"
+					   smooth="true" 
+					   visible="{!isLast}"/>		
+	</s:HGroup>
+
+
+</s:Group>

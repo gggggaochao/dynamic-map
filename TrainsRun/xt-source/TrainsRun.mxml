@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:st="http://www.missiongroup.com.cn/2012/flex4"
+					   xmlns:core="com.missiongroup.car.core.*"
+					   showStatusBar="false" 
+					   width="2732" height="512"
+					   backgroundAlpha="0.0"
+					   applicationComplete="init()" 
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)" 
+					   xmlns:views="com.missiongroup.car.views.*" xmlns:test="test.*" 
+					   xmlns:logger="com.missiongroup.metro.logger.*" 
+					   xmlns:car="com.missiongroup.car.*"
+					   xmlns:debug="com.missiongroup.car.debug.*" >
+	
+	<fx:Style source="css/struts.css" />
+	<fx:Style source="css/index.css" />	
+	
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.debug.DebugLogger;
+			
+			import mx.events.FlexEvent;
+			
+			private function init() : void
+			{
+				//Mouse.hide();
+				Multitouch.inputMode = MultitouchInputMode.GESTURE;
+			}
+			
+			/**
+			 * 隐藏鼠标
+			 */
+			private function $mouseUpHandler(event:MouseEvent):void
+			{
+				//Mouse.hide();
+			}
+			
+			/**
+			 * 隐藏鼠标
+			 */
+			private function $rightMouseUpHandler(event:MouseEvent):void
+			{
+				//Mouse.hide();
+			}
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				//nativeWindow.maximizable = false;
+				nativeWindow.x = 0;
+//				nativeWindow.x = 1366;
+				nativeWindow.y = 0;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+		<car:AppStart id="start" />
+		
+		
+		
+		<logger:FileLogHandlerAction id="logger" />
+		
+		<!--
+		<debug:DebugLogger id="logger" />
+		-->
+		
+	</fx:Declarations>
+	
+	
+	<st:WebSite global="{start}" logger="{logger}">
+		
+		<st:config>
+			<st:ConfigManager>
+				<st:configFile>config/SysConfig.xml,config/application-context.xml,config/application-db.xml</st:configFile>
+			</st:ConfigManager>
+		</st:config>
+		
+		<st:skins>
+			<st:UIManager />
+		</st:skins>
+		
+		<st:components>
+			<st:ComponentsManager>
+				
+				<views:LineCanvas width="1366" height="256" dir="up" >
+					
+					<views:viewers>
+						
+						<fx:Array>
+							
+							<views:Lineview5 line="4_2" runDir="0" x="45"
+											itemWidth="64" itemHeight="65"
+											height="240" width="100%"/>
+							
+							<views:Lineview line="4" runDir="0" 
+											itemWidth="80" itemHeight="65"
+											height="280" width="1050" horizontalCenter="0" fixRing="true"/>
+							
+							<views:Lineview line="3" x="-20" runDir="0" 
+											itemWidth="64" itemHeight="65"
+											height="240" width="100%"/>
+							
+						</fx:Array>
+						
+					</views:viewers>
+					
+				</views:LineCanvas>
+				
+				<!--
+				<views:LineCanvas width="1366" height="256" dir="down" />
+				-->
+				
+			</st:ComponentsManager>
+		</st:components>
+		
+	</st:WebSite>
+	
+	
+	<test:Debug/>
+	
+	
+</s:WindowedApplication>

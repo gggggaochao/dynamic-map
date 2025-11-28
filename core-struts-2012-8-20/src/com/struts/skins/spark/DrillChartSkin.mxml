@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.struts.components.DrillChart")]
+	</fx:Metadata>
+	
+	<!-- SkinParts
+	name=maxMove, type=spark.components.Button, required=false
+	name=minMove, type=spark.components.Button, required=false
+	name=perDrill, type=spark.components.Button, required=false
+	name=nextDrill, type=spark.components.Button, required=false
+	-->
+	
+	
+	
+	<s:Group bottom="0" width="100%">
+		
+		
+		<s:Rect height="2" left="6" right="6">
+			<s:fill>
+				<s:SolidColor color="0" alpha="0.6" />
+			</s:fill>
+		</s:Rect>
+		
+		<s:Button id="minMove" />
+		
+		<s:Button id="maxMove" right="0" />
+	</s:Group>
+	
+</s:Skin>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

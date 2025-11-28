@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		width="100%" height="100%">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.missiongroup.metro.components.UpgradeProgress")]
+	</fx:Metadata>
+	
+	<!-- SkinParts
+	name=progressBar, type=mx.controls.ProgressBar, required=false
+	-->
+	
+	<s:Rect top="0" right="0" bottom="0" left="0">
+		<s:fill>
+			<s:SolidColor color="0" alpha="0.6" />
+		</s:fill>
+	</s:Rect> 
+	
+
+	
+	<s:Group width="751" height="271" horizontalCenter="0" verticalCenter="0">
+		
+		<s:BitmapImage source="@Embed(source='images/Bg_Progress.png')" />
+		
+		<s:BitmapImage source="@Embed(source='images/MIT.png')" right="20" bottom="0" />
+		
+		<s:Group height="36" left="30" right="30" verticalCenter="0">
+			<s:Rect top="0" right="0" bottom="0" left="0"  
+					radiusX="6" radiusY="6">
+				<s:fill>
+					<s:SolidColor color="0" />
+				</s:fill>
+			</s:Rect>	
+			
+			
+			<s:Rect id="progressBar" 
+					height="36" 
+					radiusX="6" radiusY="6">
+				<s:fill>
+					<!--
+					<s:LinearGradient>
+						<s:GradientEntry color="0x0c10fa" />
+						<s:GradientEntry color="0x45adcc" ratio="0.6" />
+						<s:GradientEntry color="0x0c93fa" ratio="0.8" />
+					</s:LinearGradient>
+					-->
+					<s:BitmapFill source="@Embed(source='images/Progress.png')" 
+								  fillMode="repeat" />
+					
+				</s:fill>
+			</s:Rect>		
+			
+			<s:Label id="progressDisplay" 
+					 color="0xFFFFFF" 
+					 fontSize="28" 
+					 horizontalCenter="0" verticalCenter="0"/>
+			
+			
+			<s:Label id="updateFileSizeDisplay" 
+					 fontSize="13"
+					 verticalCenter="38" right="0"/>	
+			
+			<s:Label id="updateFileDisplay" 
+					 fontSize="13"
+					 verticalCenter="38"/>
+			
+			<s:Label id="zipFileDisplay" 
+					 fontSize="13"
+					 verticalCenter="-38"/>	
+			
+			
+		</s:Group>
+
+		<s:filters>
+			<s:DropShadowFilter color="0" blurX="20" blurY="20" />
+		</s:filters>
+	</s:Group>
+
+</s:Skin>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="com.missiongroup.metro.logger.FileLogHandlerAction"/>
+    <classEntry path="com.missiongroup.metro.local.LocalSoceketServices"/>
+    <classEntry path="com.missiongroup.metro.local.LocalCMD"/>
+    <classEntry path="com.missiongroup.metro.message.LocalCmdMessage"/>
+    <classEntry path="com.missiongroup.metro.entities.Bluetooth"/>
+    <classEntry path="com.missiongroup.metro.servers.DownLoadService"/>
+    <classEntry path="com.missiongroup.metro.command.imp.DefaultDataPackage"/>
+    <classEntry path="com.missiongroup.metro.servers.ScreenshotsService"/>
+    <classEntry path="com.missiongroup.metro.entities.Prices"/>
+  </includeClasses>
+  <includeResources>
+    <resourceEntry destPath="images/Progress.png" sourcePath="images/Progress.png"/>
+    <resourceEntry destPath="images/MIT.png" sourcePath="images/MIT.png"/>
+    <resourceEntry destPath="images/Bg_Progress.png" sourcePath="images/Bg_Progress.png"/>
+  </includeResources>
+  <namespaceManifests/>
+</flexLibProperties>

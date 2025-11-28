@@ -1,0 +1,215 @@
+/* CSS file - Standard Stylesheet */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace st "http://www.missiongroup.com.cn/2012/flex4";
+
+@font-face
+{
+	fontFamily:default_font;
+	src:url("resources/fonts/SourceHanSansCN-Normal.otf");
+}      
+
+global
+{
+	/** 通用渐变颜色 */
+	gradientColors  : #999999,#666666;
+	
+	/** 滑块的渐变颜色 */
+	scrollBarGradientColors : #999999,#666666;
+
+}
+
+s|Application
+{
+	fontFamily:default_font;
+}
+
+s|DataGrid
+{
+	skinClass: ClassReference("com.struts.skins.spark.DataGridSkin"); 
+}
+
+
+s|ComboBox
+{
+	skinClass: ClassReference("com.struts.skins.spark.ComboBoxTextInputEditSkin");
+}
+
+mx|ToolTip
+{
+	color:#ffffff;
+	fontSize : 12;
+	backgroundColor:#000000;
+}
+
+s|HSlider
+{
+	skinClass : ClassReference("com.struts.skins.spark.HSliderSkin");
+}
+
+s|NumericStepper
+{
+	skinClass : ClassReference("com.struts.skins.spark.MeNumericStepperSkin");
+}
+/**
+   	垂直滚动条
+
+s|VScrollBar
+{
+	skinClass: ClassReference("com.struts.skins.spark.scrolls.VScrollBarSkin");
+}
+
+
+/**
+	水平滚动条
+
+s|HScrollBar
+{
+	skinClass: ClassReference("com.struts.skins.spark.scrolls.HScrollBarSkin");
+}
+*/
+
+
+/**
+
+	以下是   struts组件  默认的外观样式
+
+*/
+/**
+   	分页控件皮肤
+*/
+st|PagerNet
+{
+	headerColors : #efefef,#c1c1c1;
+	cornerRadius : 0;
+	skinClass: ClassReference("com.struts.skins.spark.PagerNetSkin");
+}
+
+/**
+	窗体控件皮肤
+*/
+st|Window
+{
+	headerColors : #787a7c,#35383d;
+	backgroundColor : #c1c1c1;
+	borderColor : #333333;
+	borderLightColor : #efefef;
+	headerHeight : 20;
+	cornerRadius : 6;
+	skinClass: ClassReference("com.struts.skins.spark.WindowSkin"); 
+}
+
+/**
+ 	时钟默认样式
+*/
+st|Clock
+{
+	skinClass: ClassReference("com.struts.skins.spark.ClockSkin"); 
+}
+
+/**
+	指定下拉菜单数量
+*/
+st|DropDownList
+{
+	rowCount : 8;
+	skinClass: ClassReference("com.struts.skins.spark.CustomDropDownListSkin"); 
+}
+
+/**
+	提示样式
+*/
+st|TipTool
+{
+	skinClass: ClassReference("com.struts.skins.spark.TipToolSkin"); 
+}
+
+st|IPoneItemRender
+{
+	skinClass: ClassReference("com.struts.skins.spark.renderers.IPoneItemRenderSkin"); 
+}
+
+/**
+   	控件分页容器
+*/
+st|PageContainer
+{
+	skinClass: ClassReference("com.struts.skins.spark.PageContainerSkin"); 
+}
+
+
+st|LoginGroup
+{
+	skinClass: ClassReference("com.struts.skins.spark.LoginGroupSkin"); 
+}
+
+
+st|ViewGroup
+{
+	skinClass : ClassReference("com.struts.skins.spark.ViewGroupSkin");
+}
+
+st|TextInputComponent
+{
+	skinClass : ClassReference("com.struts.skins.spark.TextInputComponentSkin");
+}
+
+
+st|ColorChooser
+{
+	skinClass : ClassReference("com.struts.skins.spark.ColorChooserSkin");
+}
+
+
+st|MTree
+{
+	skinClass : ClassReference("com.struts.skins.spark.MTreeSkin");
+}
+
+
+st|TreeNodeItemRenderer
+{
+	skinClass: ClassReference("com.struts.skins.spark.renderers.TreeNodeItemRendererSkin"); 
+}
+
+st|DrillChart
+{
+	skinClass : ClassReference("com.struts.skins.spark.DrillChartSkin");
+}
+
+st|MButton
+{
+	skinClass : ClassReference("com.struts.skins.spark.MButtonSkin");
+}
+
+st|BButton
+{
+	skinClass : ClassReference("com.struts.skins.spark.BButtonSkin");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

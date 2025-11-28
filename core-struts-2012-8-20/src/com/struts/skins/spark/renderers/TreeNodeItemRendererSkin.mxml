@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx" minHeight="20" width="100%"
+		xmlns:mtreeClasses="com.struts.components.mtreeClasses.*">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("com.struts.components.mtreeClasses.TreeNodeItemRenderer")]
+	</fx:Metadata>
+	
+	
+	
+	<s:states>
+		<s:State name="disabled" />
+		<s:State name="up" />
+		<s:State name="over" stateGroups="selectOrOver" />
+		<s:State name="select" stateGroups="selectOrOver"/>
+	</s:states>
+	<!-- SkinParts
+	name=labelDisplay, type=spark.components.Label, required=false
+	-->
+	
+	<s:Group id="treeNodeGroup" bottom="0" top="0" right="0" left="16">	
+
+		<s:Rect bottom="0" top="0" right="0" left="0" radiusX="5" radiusY="5">
+			<s:fill>
+				<s:SolidColor alpha="0" alpha.selectOrOver="1"   color.select="0" color.over="0" />
+			</s:fill>
+		</s:Rect>
+		
+		<s:Group bottom="0" top="0" right="0" left="0">
+			
+			<s:layout>
+				<s:HorizontalLayout horizontalAlign="center" verticalAlign="middle" paddingLeft="2" gap="2" />
+			</s:layout>
+			
+			<s:BitmapImage id="iconDisplay" width="16" height="16" />
+			
+			<s:Label id="labelDisplay" color.selectOrOver="0xFFFFFF" verticalCenter="0" paddingLeft="4" paddingRight="4" />
+						
+		</s:Group>
+
+	</s:Group>
+	
+	<mtreeClasses:TreeNodeButton id="treeNodeButton" verticalCenter="0" width="16" height="16" 
+								 skinClass="com.struts.skins.spark.buttons.TreeNodeButtonSkin" />
+	
+</s:Skin>

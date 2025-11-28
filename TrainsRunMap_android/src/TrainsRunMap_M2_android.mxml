@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:st="http://www.missiongroup.com.cn/2012/flex4"
+			   xmlns:core="com.missiongroup.car.core.*" 
+			   xmlns:views="com.missiongroup.car.views.*"
+			   width="2732" height="512"
+			   applicationComplete="init()" 
+			   xmlns:logger="com.missiongroup.car.logger.*" 
+			   xmlns:car="com.missiongroup.car.*"
+			   xmlns:debug="com.missiongroup.car.debug.*" xmlns:test="test.*">
+
+	<fx:Style source="css/index.css" />
+
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import mx.events.MoveEvent;
+			
+			
+			private function init() : void
+			{
+				hideMouse();
+				Multitouch.inputMode = MultitouchInputMode.GESTURE;
+				
+
+				stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+				stage.scaleMode = StageScaleMode.NO_SCALE; 
+				stage.addEventListener(MouseEvent.MOUSE_UP, $mouseUpHandler);
+				stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, $rightMouseUpHandler);
+				
+				stage.addEventListener(MouseEvent.MOUSE_MOVE, $mouseMoveHandler);
+				
+			}
+			
+			/**
+			 * 隐藏鼠标
+			 */
+			private function $mouseUpHandler(event:MouseEvent):void
+			{
+				hideMouse();
+			}
+			
+			
+			private function $mouseMoveHandler(event : MouseEvent) : void
+			{
+				
+				//mlbl.text = event.stageX + "_" + event.stageY;
+			}
+			
+			/**
+			 * 隐藏鼠标
+			 */
+			private function $rightMouseUpHandler(event:MouseEvent):void
+			{
+				hideMouse();
+			}
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				//1024 * 600;
+				//nativeWindow.maximizable = false;
+				
+//				var sX : Number = width / 1024;
+//				var sY : Number = height / 600;
+//				this.scaleX = this.scaleY = Math.min(sX,sY);
+			}
+			
+			private function hideMouse():void{
+				Mouse.hide();
+			}
+			
+		]]>
+	</fx:Script>
+
+	
+	<fx:Declarations>
+		
+		<car:AppStart id="start" />
+		
+		
+		<logger:TextLogger id="logger" />
+		
+		<!--<test:TestLog/>-->
+		
+		<!--
+		<debug:DebugLogger id="logger" />
+		-->
+	</fx:Declarations>
+
+	<st:WebSite global="{start}" logger="{logger}">
+		
+		<st:config>
+			<st:ConfigManager>
+				<st:configFile>config/SysConfig.xml,config/application-context-m2.xml,config/application-db.xml</st:configFile>
+			</st:ConfigManager>
+		</st:config>
+		
+		<st:skins>
+			<st:UIManager />
+		</st:skins>
+		
+		<st:components>
+			<st:ComponentsManager>
+				
+				<views:LineCanvas width="1366" height="256" dir="up" >
+				
+					<views:viewers>
+						
+						<fx:Array>
+							
+							<views:Lineview5 line="4_2" runDir="0" x="50"
+											 itemWidth="64" itemHeight="65"
+											 height="240" width="100%"/>
+							
+							<views:Lineview line="4" runDir="0" 
+											itemWidth="80" itemHeight="65"
+											height="280" width="1050" horizontalCenter="0" fixRing="true"/>
+							
+							<views:Lineview line="3" x="-20" runDir="0" 
+											itemWidth="64" itemHeight="65"
+											height="240" width="100%"/>
+							
+						</fx:Array>
+						
+					</views:viewers>
+					
+				</views:LineCanvas>
+				
+				<!--
+				<views:LineCanvas width="1366" height="256" dir="down" />
+				-->
+				
+			</st:ComponentsManager>
+		</st:components>
+		
+	</st:WebSite>
+	
+	<!--
+	<test:Debug/>
+	-->
+	
+	<!--
+	<s:Label id="mlbl" y="260" x="20"  text="dasfsadf" fontSize="30" />
+	-->
+	
+	
+</s:Application>

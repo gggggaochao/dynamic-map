@@ -1,0 +1,639 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:ns="http://www.missiongroup.com.cn/2012/flex4"
+		 width="1366" height="256" xmlns:views="com.missiongroup.car.views.*">
+
+	
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.messages.Logtmp;
+			import com.logging.Logger;
+			import com.logging.LoggerManager;
+			import com.missiongroup.car.core.AppSetting;
+			import com.missiongroup.car.messages.CMDMessages;
+			import com.missiongroup.metro.command.consts.Direction;
+			import com.missiongroup.metro.core.AppCache;
+			import com.missiongroup.metro.entities.TrainLine;
+			import com.missiongroup.metro.entities.TrainStation;
+			import com.struts.utils.HashTable;
+			
+			import flash.utils.clearTimeout;
+			import flash.utils.setTimeout;
+			
+			[Bean(id="setting")]
+			public var setting : AppSetting;
+			
+			[Bean(id="config")]
+			public var config : HashTable;
+
+			private var _dir  : String = Direction.UP;
+			
+			private var logger : Logger = LoggerManager.getInstance();
+			
+			// 添加一个变量来存储最新的报文内容
+			[Bindable]
+			private var _latestCommandMsg:String = "";
+			
+			// 添加一个方法来更新报文内容
+			[MessageHandler(selector="ShowCommandMsg")]
+			public function showCommandMsgHandler(message:Logtmp):void {
+				// 从Logtmp对象中提取msg属性值（字符串）
+				_latestCommandMsg = message.msg;
+				// 可以添加日志调试
+				trace("Received command message: " + _latestCommandMsg);
+			}
+			
+			public function get dir():String
+			{
+				return _dir;
+			}
+			
+			public function set dir(value:String):void
+			{
+				_dir = value;
+			}	
+			
+			private var _trainLine : TrainLine;
+			
+			private var _waitTime : Number = 500;
+			
+			[Bindable]
+			private var _bgImageSource : String;
+			
+			/**
+			 * 根据线路编号，选择底图
+			 */
+			private function setBackgorundImage(line : String) : void
+			{
+				if(line == '4_2') line = '4';
+				_bgImageSource = "assets/skins/bg_all_" + line + ".png";
+			}
+			
+			[Init]
+			public function init() : void
+			{
+				var lineKey : String = ("Line_" + setting.LineNum + "_" + _dir).toUpperCase();
+				
+				setBackgorundImage(setting.LineNum); 
+				_trainLine = AppCache.Lines.find(lineKey);
+				
+				
+				
+				if(_trainLine)
+				{
+					
+					this.x = _dir == Direction.UP ? setting.LineUpX : setting.LineDownX; 
+					this.y = _dir == Direction.UP ? setting.LineUpY : setting.LineDownY;
+					
+					arrivedview.dir = _dir;
+				
+					logoview.dir = 0;
+					logoview.line = setting.LineNum;
+					logoview.isRing = _trainLine.IsRing;
+					logoview.endStation = _trainLine.StationList[_trainLine.StationList.length - 1];
+					logoview.station = _trainLine.StationList[0];
+
+					findLineViewer(setting.LineNum);
+					
+					_waitTime = config.find("wait");
+				}
+				
+			}
+
+			private var arrivedTime : uint = 0;
+			
+			private var changeUpOrDownTime : uint = 0;
+			
+			
+			[MessageHandler(selector="WillArriveCMD")]
+			public function willArrivedHandler(msg:CMDMessages):void{
+				if(msg.Line != "4_2") return;//只能线路号是4_2时，显示4号线预到站
+				
+				setBackgorundImage(msg.Line);
+				
+				if(changeUpOrDownTime)
+				{
+					clearTimeout(changeUpOrDownTime);
+				}
+				
+				if(arrivedTime)
+				{
+					clearTimeout(arrivedTime);				
+				}
+				
+				
+				var type : String = config.find("systemType");
+				/* 计算开门侧
+				* 根据钥匙信号，来决定开门侧
+				* 1. 以钥匙信号TC1时为准，M1：左侧， M2：右侧
+				* 2. 当钥匙信号TC2时，反转
+				*/
+				var doorDir : int = msg.DoorDir == 2 ? 
+					1 
+					: 
+					msg.keyCode == 0 ? 
+					(msg.DoorDir == 0 ? (type == "M1" ? 1 : 0) : (type == "M1" ? 0 : 1)) 
+					: (msg.DoorDir == 0 ? (type == "M1" ? 0 : 1) : (type == "M1" ? 1 : 0));
+				//车厢号是否反向（实际获得车厢号，根据车厢号判断是否反向）
+				var isReverse : int = msg.IsReverse;
+				
+				if((isReverse == 1||isReverse == 2||isReverse == 3) && (doorDir == 0 || doorDir == 1 )) 
+				{
+					doorDir = (doorDir == 0 ? 1 : 0); 
+				}
+				
+				// 顶部视图设置（中间以及右侧）
+				logoview.dir = msg.Dir;
+				logoview.isRing = msg.isRing;
+				logoview.line = msg.Line;				
+				logoview.endStation = msg.EndStation;
+				
+				arrivedview.isLast = false;
+				arrivedview.isLastStation = false;
+				
+				if(msg.isRing ==0 && msg.Line=="4" && msg.line4Flag == 1)
+				{
+					arrivedview.isLast = true;
+					
+					// 4号线最后一圈最后一站
+					if(msg.StartStation == msg.CurrentStation)
+					{
+						arrivedview.isLastStation = true;
+					}
+					
+					logoview.isRingChanged = true;
+					logoview.endStation = msg.StartStation;
+				}
+				
+				// 到站视图设置
+				
+				arrivedview.doorDir = doorDir;
+				arrivedview.dir = msg.Dir == 0 ? Direction.UP : Direction.DOWN;
+				arrivedview.isRing = msg.isRing;
+				arrivedview.line = msg.Line;
+				arrivedview.endStation = msg.EndStation;
+				arrivedview.nextStation = msg.NextStation;
+				arrivedview.startStation = msg.StartStation;
+//				arrivedview.arrivedStation = msg.NextStation;
+				
+				arrivedview.showWillArrive(msg.Dir);
+				
+				arrivedTime = setTimeout(arrivedState,500,msg);
+				changeUpOrDownTime = setTimeout(changeUpOrDown,setting.ClearWaitTime,msg);
+			}
+			
+			
+			[MessageHandler(selector="ArrivedCMD")]
+			public function arrivedHandler(msg: CMDMessages):void
+			{
+				setBackgorundImage(msg.Line);
+				
+				if(changeUpOrDownTime)
+				{
+					clearTimeout(changeUpOrDownTime);
+				}
+				
+				if(arrivedTime)
+				{
+					clearTimeout(arrivedTime);				
+				}
+				
+				
+				var type : String = config.find("systemType");
+				/* 计算开门侧
+				 * 根据钥匙信号，来决定开门侧
+				 * 1. 以钥匙信号TC1时为准，M1：左侧， M2：右侧
+				 * 2. 当钥匙信号TC2时，反转
+				 */
+				var doorDir : int = msg.DoorDir == 2 ? 
+									  1 
+									  : 
+									  msg.keyCode == 0 ? 
+									 (msg.DoorDir == 0 ? (type == "M1" ? 1 : 0) : (type == "M1" ? 0 : 1)) 
+								   : (msg.DoorDir == 0 ? (type == "M1" ? 0 : 1) : (type == "M1" ? 1 : 0));
+				//车厢号是否反向（实际获得车厢号，根据车厢号判断是否反向）
+				var isReverse : int = msg.IsReverse;
+				
+				if((isReverse == 1||isReverse == 2||isReverse == 3) && (doorDir == 0 || doorDir == 1 )) 
+				{
+					doorDir = (doorDir == 0 ? 1 : 0); 
+				}
+				
+
+
+				
+				// 顶部视图设置（中间以及右侧）
+				logoview.dir = msg.Dir;
+				logoview.isRing = msg.isRing;
+				logoview.line = msg.Line;				
+				logoview.endStation = msg.EndStation;
+
+				arrivedview.isLast = false;
+				arrivedview.isLastStation = false;
+				
+				if(msg.isRing ==0 && msg.Line=="4" && msg.line4Flag == 1)
+				{
+					arrivedview.isLast = true;
+					
+					// 4号线最后一圈最后一站
+					if(msg.StartStation == msg.CurrentStation)
+					{
+						arrivedview.isLastStation = true;
+					}
+					
+					logoview.isRingChanged = true;
+					logoview.endStation = msg.StartStation;
+				}
+
+				// 到站视图设置
+
+				arrivedview.doorDir = doorDir;
+				arrivedview.dir = msg.Dir == 0 ? Direction.UP : Direction.DOWN;
+				arrivedview.isRing = msg.isRing;
+				arrivedview.line = msg.Line;
+				arrivedview.endStation = logoview.endStation;
+//				if(msg.Line == '4_2'){
+					arrivedview.startStation = msg.StartStation;
+//				}
+				arrivedview.arrivedStation = msg.CurrentStation;
+				
+				arrivedview.showArrive();
+				
+				arrivedTime = setTimeout(arrivedState,500,msg);
+				changeUpOrDownTime = setTimeout(changeUpOrDown,setting.ClearWaitTime,msg);
+			}
+			
+			private function arrivedState(msg : CMDMessages) : void
+			{
+				arrivedTime = 0;
+				
+				mapStopEffect();
+//				arrivedview.stopEffect();
+				
+				this.currentState = "arrived";
+			}
+			
+			private function changeUpOrDown(msg : CMDMessages) : void
+			{
+				changeUpOrDownTime = 0;
+				
+				if(msg.isEnd) {
+					var mapView : Lineview = findLineViewer(msg.Line);
+					if(mapView) {
+						mapView.clear(msg.isPassReset)
+					}
+				}
+			}
+			
+			[MessageHandler(selector="LeaveCMD")]
+			public function leaveHandler(msg: CMDMessages):void
+			{
+				setBackgorundImage(msg.Line);
+
+				var mapView : Lineview = findLineViewer(msg.Line);
+				
+				if(mapView) {
+					refrushMap(2,mapView,msg);
+					mapView.nextStation = msg.CurrentStation;
+					//mapView.nextStation = msg.NextStation;
+					//mapView.currentStation = msg.CurrentStation;
+				}
+
+				setTimeout(normalState,_waitTime,msg);
+			}
+			
+			private function normalState(msg : CMDMessages) : void
+			{
+				this.currentState = "normal";
+				arrivedview.stopEffect();
+			}
+
+			
+			[MessageHandler(selector="ArrivedEndCMD")]
+			public function arrivedEndHandler(msg: CMDMessages):void
+			{
+				this.currentState = "normal";
+			}
+			
+			[MessageHandler(selector="LeaveEndCMD")]
+			public function leaveEndHandler(msg: CMDMessages):void
+			{
+				this.currentState = "normal";
+			}
+			
+			protected function map_nextStationHandler(event:Event):void
+			{
+				var lineview : Lineview = event.currentTarget as Lineview;
+				logoview.currentState = "leave";
+				logoview.line = lineview.line;
+				logoview.isRing = lineview.isRing;
+				logoview.station = lineview.nextStation;				
+			}
+			
+			protected function arrivedview_arrivedStationHandler(event:Event):void
+			{	
+				logoview.currentState = "arrived";
+				logoview.line = arrivedview.line;
+				logoview.isRing = arrivedview.isRing;
+				logoview.station = arrivedview.arrivedStation;	
+			}
+			
+			[MessageHandler(selector="ChangeLine")]
+			public function changeLineHandler(msg: CMDMessages):void
+			{
+				this.currentState = "normal";
+				
+				setBackgorundImage(msg.Line);
+				
+				changLine(msg);
+			}
+			
+			[MessageHandler(selector="LeaveCMD5")]
+			public function leaveLine5Handler(msg:CMDMessages):void{
+				setBackgorundImage(msg.Line);
+				
+				this.currentState = "normal";
+				
+				var mapView : Lineview = findLineViewer(msg.Line);
+				
+				if(mapView) {
+					refrushMap(2,mapView,msg);
+					mapView.nextStation = msg.CurrentStation;
+					//mapView.nextStation = msg.NextStation;
+					//mapView.currentStation = msg.CurrentStation;
+				}
+				
+				setTimeout(normalState,_waitTime,msg);
+			}
+			
+			private function changLine(msg: CMDMessages) : void
+			{
+				
+				mapStopEffect();
+				
+				//var nextStation : TrainStation;
+
+				var mapView : Lineview = findLineViewer(msg.Line);
+				
+				if(mapView) {
+					mapView.clear(msg.isPassReset);
+					refrushMap(6,mapView,msg);
+					setChangLineView(mapView,msg);
+				}
+				
+				logoview.currentState = "leave";
+				logoview.line = msg.Line;
+				logoview.isRing = msg.isRing;
+				logoview.station = msg.NextStation;
+			}
+			
+			
+			//0-4657:15/7/17_12:0:16-7:ff 6 4 0 1a 5 1 1 0 0 0 1 0 1 0 0 0 fe 3e 33
+			private function setChangLineView(mapView : Lineview,msg: CMDMessages) : void {
+				
+				mapView.startStation = msg.StartStation;
+				mapView.nextStation = msg.NextStation;
+				mapView.endStation = msg.EndStation;
+				
+//				if(msg.Line == "4") mapView.fixRing = true;
+				mapView.isRing = msg.isRing ? 1 : msg.line4Flag;
+				
+				
+				//mapView.isLastStation = msg.isRing == 0 && msg.line4Flag == 1  ? true : msg.line4Flag != 1;
+			}
+			
+			
+			[MessageHandler(selector="PassStation")]
+			public function passStationeHandler(msg: CMDMessages):void
+			{
+				setBackgorundImage(msg.Line);
+				arrivedview.passStation = msg.CurrentStation;
+				setPassStion(7, msg);
+			}	
+			
+			[MessageHandler(selector="PassStationReSet")]
+			public function passStationReSetHandler(msg: CMDMessages):void
+			{
+				setBackgorundImage(msg.Line);
+				setPassStion(8, msg);
+			}	
+
+			
+			private function setPassStion(cmd:Number,msg: CMDMessages) : void
+			{
+				var mapView : Lineview = findLineViewer(msg.Line);
+				if(mapView) {
+					refrushMap(cmd,mapView,msg);
+					mapView.passStation = msg.CurrentStation;			
+				}
+			}
+			
+			/**
+			 * 
+			 * 设置页面参数
+			 * @param cmd 功能码
+			 * @param view 线路视图
+			 * @param msg 命令内容
+			 * 
+			 */
+			private function refrushMap(cmd:Number,view : Lineview,msg : CMDMessages) : void
+			{
+				view.startStation = msg.StartStation;
+				view.endStation = msg.EndStation;	
+				// Add by chenjun 20141210
+				view.cmd = cmd;
+				// Add by chenjun 20141208  4号线灰站方式标识，3号线一律传0
+				view.line4Flag = msg.line4Flag;
+				view.visible = true;
+				/**
+				 *  根据2014年11月需求，4号线如果灰站标识为1则起始站始终不灰，只灰掉起始站和当前站之间的站点
+				 * 	Add by chenjun 20141210
+				 */
+//				if(msg.Line == "4") view.fixRing = true;
+				view.isRing = msg.isRing;
+				view.runDir = msg.Dir;
+				view.isRingChanged = false;
+				view.isLastStation = false;
+				
+				logoview.isRingChanged = false;
+				logoview.dir = msg.Dir;
+				logoview.isRing = msg.isRing;
+				logoview.line = msg.Line;
+				logoview.endStation = msg.EndStation;
+				
+				if(msg.isRing == 0 && (cmd == 2 || cmd == 6) && msg.Line=="4" && msg.line4Flag == 1)
+				{
+					// 4号线最后一圈最后一站
+					if(msg.StartStation == msg.CurrentStation)
+					{
+						view.isLastStation = true;
+					}
+					
+					view.isRing = 1;
+					view.isRingChanged = true;
+					
+					logoview.isRingChanged = true;
+					logoview.endStation = msg.StartStation;
+					
+				}
+				
+				
+				
+			}
+			
+			
+			
+			
+			
+			private var _viewers : Array;
+
+			public function get viewers():Array
+			{
+				return _viewers;
+			}
+
+			public function set viewers(value:Array):void
+			{
+				_viewers = value;
+			}
+			
+			override protected function createChildren():void
+			{
+				super.createChildren();
+				
+				if(_viewers && _viewers.length) {
+				
+					for each(var mapView : Lineview in _viewers) {
+						mapView.addEventListener("nextStation",map_nextStationHandler);
+						map.addElement(mapView);
+					}
+				}
+				
+			}	
+			
+			
+			private function findLineViewer(line : String) : Lineview
+			{
+			
+				var currmapView : Lineview;
+				for each(var mapView : Lineview in _viewers) {
+					mapView.visible = mapView.line == line;
+					if(mapView.visible) currmapView = mapView;
+				}
+				
+				return currmapView;
+			}
+			
+			
+			private function mapStopEffect() :void
+			{
+				for each(var mapView : Lineview in _viewers) {
+					mapView.stopEffect();
+				}
+			}
+			
+			protected function arrivedview_willArriveStationHandler(event:Event):void
+			{
+				logoview.currentState = "leave";
+				logoview.line = arrivedview.line;
+				logoview.isRing = arrivedview.isRing;
+				logoview.station = arrivedview.nextStation;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<ns:SpringConfig />
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="normal" />
+		<s:State name="arrived" />
+	</s:states>
+	
+	<s:transitions>
+		<s:Transition fromState="*" toState="*">
+			<s:Parallel duration="400">
+				<s:Animate target="{arrivedview}" >
+					<s:motionPaths>
+						<s:SimpleMotionPath property="y"   />
+					</s:motionPaths>
+				</s:Animate>
+				<s:Animate target="{map}" >
+					<s:motionPaths>
+						<s:SimpleMotionPath property="y"  />
+					</s:motionPaths>
+				</s:Animate>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+	
+	<s:BitmapImage source="assets/images/bg_all.png" smooth="true" />
+	<s:BitmapImage id="bgImage" source="{_bgImageSource}" smooth="true" />
+	
+	<s:HGroup x="45" y="8" gap="10">
+		<views:Logoview id="logoview" width="100" />
+		<s:Label id="commandMsgLabel" 
+				 text="{_latestCommandMsg}"
+				 fontSize="18"
+				 color="#000000"
+				 fontWeight="bold"
+				 maxDisplayedLines="2"
+				 width="500"
+				 toolTip="{_latestCommandMsg}" />
+	</s:HGroup>
+
+	<!--
+	<views:Logoview id="logoview" y="8" x="10" width="100%" />
+	-->
+	
+	<s:Group top="35" left="10" right="10" bottom="10" clipAndEnableScrolling="true">
+		
+		<views:Arrivedview id="arrivedview" 
+						   y.arrived="10" y="-190" horizontalCenter="0"
+						   arrivedStation="arrivedview_arrivedStationHandler(event)" willArriveStation="arrivedview_willArriveStationHandler(event)"/>
+
+		<s:Group id="map" 
+				 height="240" width="1240" horizontalCenter="0"
+				 y="12" y.arrived="240">
+			
+			<!--
+			<views:Lineview id="map4" 
+							line="4" 
+							itemWidth="80" itemHeight="75"
+							height="280" width="1050" horizontalCenter="0"
+							nextStation="map_nextStationHandler(event)"/>
+			
+			<views:Lineview id="map3" 
+							line="3"  
+							itemWidth="74" itemHeight="75"
+							height="240" width="100%"
+							nextStation="map_nextStationHandler(event)"/>			
+			-->
+			
+		</s:Group>
+	
+		
+
+	</s:Group>
+	
+	<!--
+	<views:Footview id="foot" bottom="0" />
+	-->
+	
+</s:Group>
+
+
+
+
+
+
+
+
+
+
+
+

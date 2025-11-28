@@ -1,0 +1,123 @@
+<!--
+////////////////////////////////////////////////////////////////////////////////
+
+ 			Copyright © MIT
+			上海鸣啸信息科技发展有限公司
+
+ 			
+			
+   协议名称 ： iPis3地铁数据协议 
+   协议版本 ： 1.0 Beta
+   协议制定人：zhouHan
+   协议说明 ： 该协议是用于对iPis3地铁数据的加载，是iPis3的全局共享数据，
+               当iPis3启动后，检查如SQLite中没有地铁数据，会请求服务获取该协议，离线iPis3 将直接放置在跟目录下
+             
+  节点属性说明：
+
+			 MetroLine 线路节点
+			           ShortName 简称
+					   IsRing 是否环形
+					   Name   线路名称
+					   NameE  线路英文名
+
+             MainLine 主线 
+			          Dir  方向(Up|Down  上行|下行)  如方向为Up 那么 Down 为 MainLine 子节点集合倒序
+
+			 FeederLine 支线
+			            LinkStationId 连接的站点ID
+                        Dir 方向(Up|Down  上行|下行)   根据 LinkStationId 和 Dir 连接到指定的站点处
+
+			 Station  站点
+			          IsRun : 是否开通 
+					  StationId : 站点ID   同一站点的ID必须是唯一的 
+					  Name ：站点名称
+					  NameE　：站点英文名
+					  Spell ：拼音简码
+			
+			 DownTime 下行时刻 		  
+			 UpTime   上行时刻
+			          STime      运营开始时间
+					  ETime      运营结束时间
+					  WaitTime   停留时间
+					  DriveTime  到下一战的行驶时间
+
+		    
+////////////////////////////////////////////////////////////////////////////////
+-->
+
+<Subways CityName="上海" CitySpell="SH"  Dir="开往 {0}方向"  DirE = "To the Direction of {0} Station">
+  <MetroLine ShortNum="3" IsRing="0" NameE="Metro Line 3" Name="地铁3号线">
+    <MainLine Dir="Up">
+	  <Station IsRun="1" StationId="1000128" NameE="Xi San Zhuang" Spell="shnz" Name="西三庄">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000025" NameE="Shui Shang Gong Yuan" Spell="sllz" Name="水上公园">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000024" NameE="Bai Shu Zhuang" Spell="lclz" Name="柏林庄">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000023" NameE="Shi Zhuang" Spell="cxlz" Name="市庄">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000022" NameE="Xiao Hui Lou" Spell="yslz" Name="小灰楼">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000021" NameE="Zhong Shan Guang Chang" Spell="hqlz" Name="中山广场">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000020" NameE="Dong Li" Spell="hqlz" Name="东里">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000019" NameE="Huai An Qiao" Spell="yaxlz" Name="槐安桥">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000018" NameE="Xi San Jiao" Spell="zsgyz" Name="西三教">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000017" NameE=" Shi Jia Zhuang Zhan" Spell="jsjlz" Name="石家庄站">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000016" NameE="Dong Guang Chang" Spell="cylz" Name="东广场">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000015" NameE="Sun Chun" Spell="zplz" Name="孙村">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000138" NameE="TA Zhong" Spell="ztlz" Name="塔冢">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000013" NameE="Dong Wang" Spell="shhcz" Name="东王">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+	        <Station IsRun="1" StationId="1000012" NameE="Nan Wang" Spell="shhcz" Name="南王">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000149" NameE="Wei Tong" Spell="bslz" Name="位同">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+      <Station IsRun="1" StationId="1000003" NameE="San Jiao Tang" Spell="dbxlz" Name="三教堂">
+        <UpTime DriveTime="532" WaitTime="36" STime="5:26" ETime="22:35"/>
+        <DownTime DriveTime="520" WaitTime="29" STime="5:15" ETime="22:10"/>
+      </Station>
+    </MainLine>
+  </MetroLine>
+
+ 
+</Subways>

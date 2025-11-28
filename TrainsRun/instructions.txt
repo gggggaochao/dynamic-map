@@ -1,0 +1,24 @@
+测试上海3、4号线动态地图
+
+
+DEBUG参数含义：
+
+4 4 0 1 1 2 1d 0 0 0 1 0 1 0 0 2
+
+第一位：CMD类型，对应类：com.missiongroup.car.services.CMDServices，2=离站，3=离站（结束），4=到站，5=到站（结束），6=线路切换，7=越站，8=越站恢复
+第二位：LineNum 几号线
+第三位：Dir 方向 0=上行（出库），1=下行（入库）
+第四位：StartStation 起始站
+第五位：CurrStation 当前站
+第六位：NextStation 下一站
+第七位：EndStation 终点站
+第八位：DoorDir 开门方向
+第九位：isRing 是否环线（0：本线非环线	1：本线环线）
+第十位：isPass 越站设置（0：当前站正常	1：当前站越站）
+第十一位：isPassReset 越站恢复（0：不恢复当前越站	1：恢复当前越站信息） 
+第十二位：keyCode 钥匙信号（0: 钥匙在TC1端	1：钥匙在TC2端）
+第十三位：isReverse 车厢号是否反向（1,2,3：正向开门		4,5,6：反向开门）
+第十四位：line4Flag 0：四号线起始站、终点站不同。起始站驶过后变灰。1：四号线起始站、终点站相同。起始站驶过后不变灰。
+
+
+解析类：test/Debug.mxml，实体化类：com.missiongroup.car.messages.CMDMessages

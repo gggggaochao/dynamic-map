@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<componentPackage>  
+
+	<!-- 主框架类  -->
+            
+    <component id="WebSite" class="com.struts.WebSite"/> 
+    
+    <component id="ComponentsManager" class="com.struts.managers.ComponentsManager"/> 
+    
+    <component id="ComponentsManagerDock" class="com.struts.managers.ComponentsManagerDock"/> 
+    
+    <component id="ConfigManager" class="com.struts.managers.ConfigManager"/> 
+   
+    <component id="Ani18NManager" class="com.struts.managers.Ani18NManager"/> 
+     
+    <component id="UIManager" class="com.struts.managers.UIManager"/> 
+
+    <component id="FrameBase" class="com.struts.core.FrameBase"/> 
+    
+    <component id="LayoutBase" class="com.struts.core.LayoutBase"/>  
+    
+    <component id="ModuleBase" class="com.struts.core.ModuleBase"/> 
+
+    <component id="StringBundle" class="com.struts.core.StringBundle"/> 
+    
+   
+    
+    
+    <!-- 控件类  -->    
+    <component id="MenuTree" class="com.struts.components.MenuTree"/>  
+    
+    <component id="Window" class="com.struts.components.Window"/> 
+    
+    <component id="PagerNet" class="com.struts.components.PagerNet"/> 
+    
+    <component id="FormGroup" class="com.struts.components.FormGroup"/> 
+    
+    <component id="GridView" class="com.struts.components.GridView"/> 
+    
+    <component id="IPoneContainer" class="com.struts.components.IPoneContainer"/> 
+             
+    <component id="FormItemGroup" class="com.struts.components.formClasses.FormItemGroup"/> 
+
+    <component id="EditorGridColumn" class="com.struts.components.dataGridClasses.EditorGridColumn"/> 
+        
+	<component id="DropDownList" class="com.struts.components.CustomDropDownList"/>
+	
+	<component id="ConfigGroup" class="com.struts.components.ConfigGroup"/>
+	
+	<component id="VideoPlay" class="com.struts.components.VideoPlay"/>
+	
+	<component id="Clock" class="com.struts.components.Clock"/>
+	
+	<component id="TipTool" class="com.struts.components.TipTool"/>
+	
+	<component id="IPoneItemRender" class="com.struts.components.iponeClasses.IPoneItemRender"/>
+	
+	<component id="PageContainer" class="com.struts.components.PageContainer"/>
+
+	<component id="LoginGroup" class="com.struts.components.LoginGroup"/>
+	
+	<component id="ViewGroup" class="com.struts.components.ViewGroup"/>    
+	
+	<component id="TextInputComponent" class="com.struts.components.TextInputComponent"/> 
+	
+	<component id="ColorChooser" class="com.struts.components.ColorChooser"/> 
+	
+	<component id="IFrame" class="com.struts.components.IFrame"/> 
+	
+	<component id="PageTileGroup" class="com.struts.components.PageTileGroup"/> 
+	
+	<component id="MTree" class="com.struts.components.MTree"/> 
+	
+	<component id="TreeNodeItemRenderer" class="com.struts.components.mtreeClasses.TreeNodeItemRenderer"/> 
+
+	<component id="TreeNodeButton" class="com.struts.components.mtreeClasses.TreeNodeButton"/> 
+
+	<component id="DrillChart" class="com.struts.components.DrillChart"/> 
+
+	<component id="MButton" class="com.struts.components.MButton"/> 
+
+	<component id="HSlideGroup" class="com.struts.components.HSlideGroup"/>
+	
+	<component id="BButton" class="com.struts.components.BButton"/> 
+	
+	<!-- layout -->
+	<component id="SnakeLayout" class="com.struts.layout.SnakeLayout"/>
+
+	<component id="RingLayout" class="com.struts.layout.RingLayout"/>
+		
+	<!-- Spring -->
+	<component id="SpringConfig" class="com.spring.tags.view.ConfigureTag"/>
+	
+	
+	<!-- Exception  -->
+	<component id="GlobalExceptionHandler" class="com.core.GlobalExceptionHandler"/> 
+</componentPackage> 
+
+
+
+
+
+
+
+
+
+
+
+
+

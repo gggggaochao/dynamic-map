@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 height="24">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.metro.entities.TrainLine;
+			import com.missiongroup.metro.entities.TrainStation;
+			
+			[Bindable]
+			private var LINE_IMAGE_PATH : String;
+			
+			[Bindable]
+			private var STATION_NAME : String;
+			
+			[Bindable]
+			private var STATION_NAME_EN : String;
+			
+			
+			[Bindable]
+			private var END_STATION_NAME : String;
+			
+			[Bindable]
+			private var END_STATION_NAME_EN : String;
+			
+			[Bindable]
+			private var RING_NAME : String;
+			
+			[Bindable]
+			private var RING_NAME_EN : String;
+			
+			
+			[Bindable]
+			private var _fontColor : uint;
+			[Bindable]
+			private var _fillColor : uint;
+			[Bindable]
+			private var _rightVisible:Boolean = true;
+			
+			public var dir : Number;
+			
+			[Bindable]
+			private var _line : String;
+			[Bindable]
+			private var _lineNum:String;
+			
+			public function get endStation():TrainStation
+			{
+				return _endStation;
+			}
+
+			public function set line(value:String):void
+			{
+				_rightVisible = true;
+				
+				if(_line != value)
+				{
+					_line = value;
+					_lineNum = _line;
+					
+					if(_line == '4_2'){
+						_lineNum = '4';
+					}
+					
+					_fontColor = value ==  "3" ? 0x000000 : 0xffffff;
+					_fillColor = value ==  "3" ? 0xFEEF41 : 0x4F2E8B;
+					LINE_IMAGE_PATH = "assets/images/icon_line_line" + value + ".png";
+				}
+				
+				if(_line == '4_2'){
+					_rightVisible = dir == 1;
+				}
+				
+			}
+			
+			
+			private var _isRing : Number;
+			
+			// Add by chenjun 20141213
+			// 4号线最后一圈时更改显示内容为：终点站：起始站
+			private var _isRingChanged : Boolean = false;
+			
+			public function set isRing(value : Number) : void
+			{
+				// 根据环线标志是否改动来更改右上角显示内容
+				if(!_isRingChanged)
+				{
+					if(_isRing != value) {
+						_isRing = value;
+						RING_NAME = value ? "环线" : "终点站";
+						RING_NAME_EN = value ? "Loop Line" : "Terminus";
+					}
+				} 
+				else
+				{
+					RING_NAME = "终点站";
+					RING_NAME_EN = "Terminus";
+				}
+			}
+			
+			public function set isRingChanged(value : Boolean) : void
+			{
+				_isRingChanged = value;
+			}
+			
+			private var _trainStation : TrainStation;
+
+			public function get station():TrainStation
+			{
+				return _trainStation;
+			}
+			
+			public function set station(value:TrainStation):void
+			{
+				
+				if(_trainStation != value && value != null)
+				{
+					_trainStation = value;
+
+					STATION_NAME = value.Name;
+					STATION_NAME_EN = value.NameE;
+				}
+			}
+			
+			
+			
+			private var  _endStation : TrainStation;
+
+			public function set endStation(value:TrainStation):void
+			{
+				if(!value || _endStation == value)
+					return;
+				
+				if(_isRing) {
+					
+					END_STATION_NAME = dir ? "外圈" : "内圈";
+					END_STATION_NAME_EN = dir ?  "Outer Ring" : "Inner Ring";
+				}
+				else
+				//else if(_endStation != value)
+				{
+					_endStation = value;
+					
+					END_STATION_NAME = value.Name;
+					END_STATION_NAME_EN = value.NameE;		
+					
+					if(_line == '4_2'){
+						switch(END_STATION_NAME){
+							case '上海南站':
+							case '石龙路':
+							case '龙漕路':
+							case '漕溪路':
+								END_STATION_NAME = "3号线"+END_STATION_NAME;
+						}
+					}
+					
+				}
+				
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="leave" />
+		<s:State name="arrived" />
+	</s:states>
+	
+	
+	<s:HGroup x="420" height="100%" verticalAlign="middle" gap="5">
+
+		<s:Group width="24" height="30">
+			<s:Rect top="0" left="0" right="0" bottom="0">
+				<s:fill>
+					<s:SolidColor color="{_fillColor}" />
+				</s:fill>
+			</s:Rect>
+			
+			<s:Label text="{_lineNum}"
+					 color="{_fontColor}" 
+					 height="100%" verticalAlign="middle" width="100%" textAlign="center" 
+					 fontSize="20"/>	
+		</s:Group>
+		
+		
+		<s:Label text="号线"
+				 color="0xffffff" 
+				 fontSize="24"/>	
+		
+		
+		<s:Label text.leave="下一站"
+				 text.arrived="当前站"
+				 color="0xffffff" paddingLeft="10" 
+				 fontSize="24"/>
+		
+		
+		<s:HGroup height="100%" verticalAlign="middle" gap="20" paddingLeft="30">
+			<s:Label text="{STATION_NAME}"
+					 color="0xffffff" 
+					 fontSize="24" />
+			
+			<s:Label text="{STATION_NAME_EN}"
+					 color="0xffffff"
+					 fontSize="14" />		
+		</s:HGroup>
+		
+	</s:HGroup>
+	
+
+	<s:HGroup x="1100" height="100%" verticalAlign="middle" gap="20" y="-6" visible="{_rightVisible}">
+
+		<s:VGroup gap="0"   width="80" horizontalAlign="center">
+			<s:Label text="{RING_NAME}"
+					 color="{_fontColor}" 
+					 fontSize="20" />
+			
+			<s:Label text="{RING_NAME_EN}"
+					 color="{_fontColor}"
+					 fontSize="11" />
+		</s:VGroup>		
+		
+		<s:VGroup gap="0"   width="140" horizontalAlign="center">
+			<s:Label text="{END_STATION_NAME}"
+					 color="{_fontColor}" 
+					 fontSize="20"/>
+			
+			<s:Label text="{END_STATION_NAME_EN}"
+					 color="{_fontColor}"
+					 fontSize="11" />
+		</s:VGroup>		
+	</s:HGroup>
+	
+</s:Group>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

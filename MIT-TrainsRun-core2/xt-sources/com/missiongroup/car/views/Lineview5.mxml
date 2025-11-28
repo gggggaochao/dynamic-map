@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<views:Lineview xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:views="com.missiongroup.car.views.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.consts.DisplayDir;
+			protected override function loadLineStations() : void
+			{
+				
+				const rowCount : int = 14;
+				const evenOffsetX : Number = -10;//dir == Direction.UP && _runDir == 0 ? -10 : -115;
+				
+				ring.rowNumber = rowCount;
+				ring.evenOffsetX = evenOffsetX;
+				
+				this.layout = ring;
+				
+				//passTrainsStations = new Array();
+				
+				var list : Array = dataProvider.slice(0,rowCount);
+				trace(list.length);
+				addStationToMap(list,DisplayDir.Right);
+				
+				list = dataProvider.slice(rowCount);
+				trace(list.length);
+				addStationToMap(list,DisplayDir.Left,true);	
+				
+			}
+			
+			protected override function getDataProvider() : Array{
+				var dp:Array = super.getDataProvider();
+				if(line == '4_2' && dir == 'down'){
+					
+					var endIndex:int = _trainLine.StationList.indexOf(_endStation);
+					if(endIndex > 26 && endIndex < 30){
+						//处理最后一站不是上海南站的情况
+						dp.splice(endIndex+1 , 30-endIndex);
+						var delCount:int = endIndex - 27;
+						if(delCount > 0) dp.splice(27, delCount);
+					}else{
+						dp.splice(27,3);
+					}
+					
+				}
+				
+				return dp;
+			}
+			
+			protected override function getDir(meDir:String, isStart:Boolean, isEnd:Boolean):String{
+				if(meDir == DisplayDir.Left && isEnd){
+					return DisplayDir.LeftEnd;
+				}
+				return super.getDir(meDir,isStart,isEnd);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+</views:Lineview>

@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<beans>
+	
+	<!-- 数据源配置 -->
+	<bean id="dataSource" class="com.missiongroup.metro.dao.SQLiteDao">
+		<property name="path" value="app:/dbs/iPis3Database.db3"/>
+	</bean>
+		
+</beans>
+
+
+
+
+
+

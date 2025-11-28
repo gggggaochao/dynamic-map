@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+    ADOBE SYSTEMS INCORPORATED
+    Copyright 2008 Adobe Systems Incorporated
+    All Rights Reserved.
+
+    NOTICE: Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the license agreement accompanying it.
+
+-->
+
+<!--- The default skin class for a Spark SkinnableContainer container.  
+
+     @see spark.components.SkinnableContainer
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+    	xmlns:fb="http://ns.adobe.com/flashbuilder/2009" 
+		minHeight="200" minWidth="300"
+		alpha.disabled="0.5">
+	<fx:Metadata>
+		[HostComponent("com.struts.components.Window")]
+	</fx:Metadata>
+
+    <fx:Script fb:purpose="styling">
+        <![CDATA[         
+            /**
+             *  @private
+             */
+			
+			private var headerFontColor : uint;
+			
+			private static const PADDING_NUM : int = 10;
+			
+            override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+            {
+                // Push backgroundColor and backgroundAlpha directly.
+                // Handle undefined backgroundColor by hiding the background object.
+				if(!isNaN(getStyle("headerFontColor")))
+				{
+					if(headerFontColor == getStyle("headerFontColor"))
+						return;
+					
+					headerFontColor = getStyle("headerFontColor");
+					titleDisplayLabel.setStyle("color",headerFontColor);
+					closeButton.setStyle("color",headerFontColor);
+				}
+				
+				if(!isNaN(getStyle("headerHeight")))
+				{
+					headGroup.height = getStyle("headerHeight");
+					contentGroup.top = bgRect.top = background.top = headGroup.height;
+				}
+				
+				if(!isNaN(getStyle("borderLightColor")))
+				{
+					light1.color = light2.color = light3.color = getStyle("borderLightColor");
+				}
+				
+				if (!isNaN(getStyle("borderColor")))
+				{
+					bgBorder.color = getStyle("borderColor");
+				}
+				
+				if(!isNaN(getStyle("cornerRadius")))
+				{
+					headBackgroud.topLeftRadiusX = getStyle("cornerRadius");
+					headBackgroud.topLeftRadiusY = getStyle("cornerRadius");
+					headBackgroud.topRightRadiusX = getStyle("cornerRadius");
+					headBackgroud.topRightRadiusY = getStyle("cornerRadius");
+					
+					backBorder.radiusX = borderlight.radiusX = background.radiusX = getStyle("cornerRadius");
+					backBorder.radiusY = borderlight.radiusY = background.radiusY = getStyle("cornerRadius");
+				}
+				
+                if (!isNaN(getStyle("backgroundColor")))
+                {
+                    bgFill.color = getStyle("backgroundColor");
+                    bgFill.alpha = getStyle("backgroundAlpha");
+                }
+                
+				var headerColors : Array = getStyle("headerColors");
+				
+				if(headerColors && headerColors.length > 1)
+				{
+					var entries : Array = [];
+					var linearGradient : LinearGradient = new LinearGradient();
+					var color : uint;
+					linearGradient.rotation = 90;
+					
+					for each(var vo : * in headerColors)
+					{
+						color = uint(vo);
+						var ge : GradientEntry = new GradientEntry(color);
+						entries.push(ge);
+					}
+					linearGradient.entries = entries;
+					
+					headBackgroud.fill = linearGradient;
+					borderFill.color = color;
+				}
+				else
+				{
+					headBackgroud.fill = lineFill;
+					borderFill.color = 0xc1c1c1;
+				}
+				
+				
+                super.updateDisplayList(unscaledWidth, unscaledHeight);
+            }
+        ]]>        
+    </fx:Script>
+    
+	<fx:Declarations>
+		<s:LinearGradient id="lineFill" rotation="90">
+			<s:GradientEntry color="#7a7b7d" />
+			<s:GradientEntry color="#35383d"/>
+		</s:LinearGradient>		
+	</fx:Declarations>
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+	
+    <!--- Defines the appearance of the SkinnableContainer class's background. -->
+
+
+	<s:Group id="headGroup" left="1" right="1" top="1" height="28">
+		<s:Rect id="headBackgroud" left="-1" right="-1" top="-1" bottom="-1" />
+		
+		<s:Label id="titleDisplayLabel"
+				 textAlign="right" fontWeight="normal"
+				 verticalAlign="middle"
+				 maxDisplayedLines="1" fontSize="12" color="0xFFFFFF"
+				 verticalCenter="0" left="10">
+			<s:filters>
+				<s:GlowFilter blurX="6" blurY="6" color="0x000000" quality="2" strength="1"/>
+			</s:filters>
+		</s:Label>
+		
+		<s:Button id="closeButton" skinClass="com.struts.skins.spark.window.CloseButtonSkin" 
+				  verticalCenter="0" right="5" color="0xFFFFFF" />
+	</s:Group>
+
+	<s:Rect id="backBorder" left="0" right="0" top="0" bottom="0">
+		<s:stroke>
+			<s:SolidColorStroke id="bgBorder" color="#c1c1c1" />
+		</s:stroke>
+	</s:Rect>
+	
+	<s:Rect id="background" left="0" right="0" top="28" bottom="0">
+		<s:fill>
+			<!--- @private -->
+			<s:SolidColor id="borderFill" color="#eaeaea"/>
+		</s:fill>
+	</s:Rect>
+
+	<s:Rect id="bgRect" left="4" right="4" top="28" bottom="4">
+		<s:fill>
+			<!--- @private -->
+			<s:SolidColor id="bgFill" color="#eaeaea"/>
+		</s:fill>
+	</s:Rect>
+	
+	
+	<s:Rect id="borderlight" left="1" right="1" top="1" bottom="1">
+		<s:stroke>
+			<s:LinearGradientStroke rotation="90">
+				<s:GradientEntry id="light1" color="0xc1c1c1" alpha="0.5" />	
+				<s:GradientEntry id="light2" color="0xc1c1c1" alpha="0.3" />
+				<s:GradientEntry id="light3" color="0xc1c1c1" alpha="0.5" />
+			</s:LinearGradientStroke>
+			
+		</s:stroke>
+	</s:Rect>	
+    <!--
+        Note: setting the minimum size to 0 here so that changes to the host component's
+        size will not be thwarted by this skin part's minimum size.   This is a compromise,
+        more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
+    -->
+    <!--- @copy spark.components.SkinnableContainer#contentGroup -->
+    <s:Group id="contentGroup" left="4" right="4" top="28" bottom="4" minWidth="0" minHeight="0">
+        <s:layout>
+            <s:BasicLayout/>
+        </s:layout>
+    </s:Group>
+
+	<s:Button id="resizeButton" bottom="1" right="1"
+			  skinClass="com.struts.skins.spark.window.ResizeButtonSkin" />
+	
+	<s:filters>
+		<s:DropShadowFilter color="0" alpha="0.8" blurX="8" blurY="8" />
+	</s:filters>
+</s:Skin>

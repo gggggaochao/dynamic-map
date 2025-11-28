@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="50" y="260" creationComplete="group1_creationCompleteHandler(event)">
+
+	
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.commands.CommandPackage;
+			import com.missiongroup.car.services.CMDServices;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			import mx.utils.StringUtil;
+			
+			private var services : CMDServices;
+			
+			protected function button8_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				sendMessage(cotentText.text);				
+			}
+			
+			private function sendMessage(text:String):void
+			{
+				var cmds : Array = filterArray(text.split(" "));
+				if(cmds.length >= 12) 
+				{	
+					
+					//Number(1d)
+					
+					var content : XML = new XML("<content />");
+					content.@LineNum = numberConvert(cmds[1]);
+					content.@Dir = numberConvert(cmds[2]);
+					content.@StartStation = numberConvert(cmds[3]);
+					content.@CurrStation = numberConvert(cmds[4]);
+					content.@NextStation = numberConvert(cmds[5]);
+					content.@EndStation = numberConvert(cmds[6]);
+					content.@DoorDir = numberConvert(cmds[7]);
+					content.@isRing = numberConvert(cmds[8]);
+					content.@isPass = numberConvert(cmds[9]);
+					content.@isPassReset = numberConvert(cmds[10]);
+					content.@keyCode = numberConvert(cmds[11]);		
+					content.@isReverse = numberConvert(cmds[12]);
+					content.@line4Flag = numberConvert(cmds[13]);
+					
+					var commandPackage : CommandPackage = new CommandPackage();
+					commandPackage.Cmd = uint(cmds[0]);
+					commandPackage.Content = content;
+					
+					
+					initServer();
+					services.cmd = commandPackage.Cmd; 
+					services.command = commandPackage;				
+				}			
+			}
+			
+			
+			private function filterArray(cmds:Array):Array
+			{
+				var a:Array = [];
+				
+				for each(var s:String in cmds) {
+					if(s) a.push(s);
+				}
+				
+				return a;
+			}
+			
+			private function numberConvert(s:String):String {
+				
+				if(isNumber16.selected) {
+					s = StringUtil.trim("0x"+(s.length>0?s:"0"+s));
+					return Number(s).toString(10);
+				}
+				return StringUtil.trim(s);
+			}
+
+			private function initServer() : void
+			{
+				if(!services) {
+					services = new CMDServices();
+				}
+			}
+			
+			[Bindable]
+			private var cmdArray : ArrayCollection;
+			
+			private function initCommandsText() : void
+			{
+				var nameStr : String;
+				var file : File = new File("app:/cmds.txt");
+				var fileStream : FileStream = new FileStream();
+				fileStream.open(file,FileMode.READ);
+				//fileStream.close();
+				
+				nameStr = fileStream.readUTFBytes(fileStream.bytesAvailable);
+				fileStream.close();
+				if(nameStr)
+				{
+					nameStr = StringUtil.trim(nameStr);
+					cmdArray = new ArrayCollection(nameStr.split("\r\n"));
+				}
+				//namesGroup.names = names;
+			}
+			
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				initCommandsText();
+				cotentText.text = cmdArray.getItemAt(0) as String;
+			}
+			
+			protected function button9_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				initCommandsText();
+			}
+			
+			private var indexCmd : int = 0;
+			
+			protected function button10_clickHandler(event:MouseEvent):void
+			{
+				
+				
+				if(cmdArray && indexCmd >= cmdArray.length)
+					indexCmd = 0;
+				
+				var msg:String = cmdArray.getItemAt(indexCmd) as String;
+				
+				cotentText.text = msg;
+				sendMessage(msg);	
+				indexCmd++;
+				// TODO Auto-generated method stub
+				//initCommandsText();
+			}			
+		]]>
+	</fx:Script>
+	<s:Rect left="0" right="0" bottom="0" top="0">
+		<s:fill>
+			<s:SolidColor color="#39ad39" />
+		</s:fill>
+	</s:Rect>
+	<s:HGroup verticalAlign="middle" height="100%" paddingLeft="20">
+		<s:Label text="Window 测试工具" color="#ffffff"/>
+		<s:DropDownList id="cmdList" dataProvider="{cmdArray}" width="240" requireSelection="true" 
+						color="0x999999"
+						change="cotentText.text = cmdList.selectedItem" />
+		<s:TextInput id="cotentText" width="200" color="#ffffff" />
+		<s:CheckBox id="isNumber16" label="是否16进制" color="#ffffff" selected="true"/>
+		<s:Button label="Send" click="button8_clickHandler(event)" />
+		<s:Button label="Send CMDS" click="button10_clickHandler(event)" />
+		<s:Button label="Refrush" click="button9_clickHandler(event)" />		
+	</s:HGroup>
+
+</s:Group>

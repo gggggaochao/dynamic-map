@@ -1,0 +1,16 @@
+<extension xmlns="http://ns.adobe.com/air/extension/2.5">
+	<id>com.mission.android.serialport</id>
+	<versionNumber>1</versionNumber>
+	
+	<platforms>
+		<platform name="Android-ARM">
+			<applicationDeployment>			
+				<nativeLibrary>SerialportANENative.jar</nativeLibrary>
+				<initializer>com.mission.serialportane.SerialportExtension</initializer>			
+			</applicationDeployment>
+
+			
+		</platform>
+	</platforms>
+
+</extension>

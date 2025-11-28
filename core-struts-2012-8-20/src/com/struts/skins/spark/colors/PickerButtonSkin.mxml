@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+MissionGroup Copyright 2012 All Rights Reserved.
+NOTICE: MIT MissionGroup permits you to use, modify, and distribute this file
+in accordance with the terms of the license agreement accompanying it.
+-->
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("spark.components.Button")]
+	</fx:Metadata>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
+			{
+				
+				super.updateDisplayList(unscaledWidth, unscaledHeight);
+			
+			
+				var bgFillColor : uint =  getStyle("backgroundColor");
+				
+				if(!isNaN(bgFillColor))
+					bgFill.color = bgFillColor;
+				
+			}
+		]]>
+	</fx:Script>
+	
+	<!-- states -->
+	<s:states>
+		<s:State name="disabled" />
+		<s:State name="down" />
+		<s:State name="over" />
+		<s:State name="up" />
+	</s:states>
+	
+	<!-- SkinParts
+	name=iconDisplay, type=spark.primitives.BitmapImage, required=false
+	name=labelDisplay, type=spark.core.IDisplayText, required=false
+	-->
+	
+	
+	<s:Ellipse left="2" top="2" right="2" bottom="2">
+		<s:fill>
+			<s:SolidColor id="bgFill" color="0xFFFFFF"/>
+		</s:fill>		
+	</s:Ellipse>
+	
+	<s:Ellipse left="0" top="0" right="0" bottom="0">  
+		<s:fill>
+			<s:SolidColor color="0" alpha="0"/>
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="0xFFFFFF"  
+								weight="2"
+								scaleMode="none"/>			
+		</s:stroke>		
+		
+		<s:filters>
+			<s:GlowFilter color="0" alpha="0.6" 
+						  quality="1" strength="1" 
+						  blurX="5" blurY="5" />
+			
+		</s:filters>
+	</s:Ellipse> 
+	
+</s:Skin>
+

@@ -1,0 +1,939 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:ns="http://www.missiongroup.com.cn/2012/flex4" xmlns:layout="com.missiongroup.car.layout.*">
+
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.componets.StationRenderer;
+			import com.missiongroup.car.consts.DisplayDir;
+			import com.missiongroup.car.consts.DisplayMode;
+			import com.missiongroup.car.core.IStation;
+			import com.missiongroup.car.skins.DownStationRendererSkin;
+			import com.missiongroup.car.skins.LeftEndStationRenderSkin;
+			import com.missiongroup.car.skins.LeftStationRendererSkin;
+			import com.missiongroup.car.skins.RightStationRendererSkin;
+			import com.missiongroup.car.utils.HelperUtils;
+			import com.missiongroup.car.utils.RailUtils;
+			import com.missiongroup.metro.command.consts.Direction;
+			import com.missiongroup.metro.core.AppCache;
+			import com.missiongroup.metro.entities.TrainLine;
+			import com.missiongroup.metro.entities.TrainStation;
+			import com.struts.utils.HashMap;
+			
+			import mx.core.ClassFactory;
+			import mx.core.IFactory;
+			import mx.core.UIComponent;
+			import mx.events.EffectEvent;
+			
+
+			
+			public var stations : HashMap = new HashMap();
+			
+			public var fixRing:Boolean = false;
+
+			
+			protected var _startStation : TrainStation;
+			
+			protected var _endStation : TrainStation;
+			
+			private var _lineChanged : Boolean;
+			
+			// 功能码 Add by chenjun 20141210
+			private var _cmd : Number;
+			
+			public function get endStation():TrainStation
+			{
+				return _endStation;
+			}
+
+			public function set endStation(value:TrainStation):void
+			{
+				if(_endStation == value)
+					return;
+				
+				_endStation = value;
+				_lineChanged = true;
+				_dataProviderChanged = true;
+				invalidateProperties();
+			}
+			
+			public function get cmd():Number
+			{
+				return _cmd;
+			}
+			
+			public function set cmd(value:Number):void
+			{
+				_cmd = value;
+			}
+
+			public function get startStation():TrainStation
+			{
+				return _startStation;
+			}
+
+			public function set startStation(value:TrainStation):void
+			{
+				if(_startStation == value)
+					return;
+				
+				_startStation = value;
+				_lineChanged = true;
+				_dataProviderChanged = true;
+				invalidateProperties();
+			}
+			
+			
+			private var _line : String;
+
+			public function get line():String
+			{
+				return _line;
+			}
+
+			public function set line(value:String):void
+			{
+				_line = value;
+			}
+
+			
+			private var _dir : String;
+
+			public function get dir():String
+			{
+				return _dir;
+			}
+
+			public function set dir(value:String):void
+			{
+				_dir = value;
+			}
+			
+			
+			protected function getDataProvider() : Array
+			{
+				if(_startStation && _endStation) 
+				{
+					var sIndex : int = _trainLine.StationList.indexOf(_startStation);
+					var eIndex : int = _trainLine.StationList.indexOf(_endStation);
+					
+					var count : int = _trainLine.StationList.length;
+					
+					var array : Array = [];
+					if(eIndex > sIndex) 
+					{
+						array = array.concat(_trainLine.StationList);
+						return array;
+					}
+					else if(sIndex > eIndex)
+					{
+						for (var i : int = sIndex;i < count;i++) {
+							array.push(_trainLine.StationList[i]);
+						}					
+//						array = array.concat(_trainLine.StationList.slice(0,eIndex+1));
+						array = array.concat(_trainLine.StationList.slice(0 , count - array.length));
+						return array;
+					}
+//					return array;
+				}
+				
+				
+//				// 特殊处理：3号线的 上海南站、石龙路、龙潭路、漕溪路、宜山路 去除4号线的换乘
+//				if(_line == "3"){
+//					var changeRemoves:Array = ["上海南站","石龙路","龙漕路","漕溪路"];
+//					for each(var s:TrainStation in _trainLine.StationList){
+//						if(changeRemoves.indexOf(s.Name) != -1){
+//							var index:int = s.UserLines.indexOf("4");
+//							if(index != -1){
+//								s.UserLines.splice(index, 1);
+//							}
+//						}
+//					}
+//				}
+				
+				return _trainLine.StationList;
+			}
+			
+			
+			
+			private var _runDir : Number = -1;
+
+			public function set runDir(value:Number):void
+			{
+				
+				if(_runDir == value)
+					return;
+				
+				
+				_runDir = value;				
+				_lineChanged = true;
+				_dataProviderChanged = true;
+				
+				dir = value == 0 ? Direction.UP : Direction.DOWN;
+				invalidateProperties();
+			}
+			
+			protected var _trainLine : TrainLine;
+
+			public function get trainLine():TrainLine
+			{
+				return _trainLine;
+			}
+
+			
+			private var _nextStation : TrainStation;
+			
+			private var _nextStationChanged : Boolean;
+
+			public function get nextStation() : TrainStation
+			{
+				return _nextStation;
+			}
+			
+			public function set nextStation(value:TrainStation):void
+			{
+				_nextStation = value;
+				_nextStationChanged = true;
+				_lineChanged = true;
+				
+				invalidateProperties();
+				
+			}
+			// Add by chenjun 20141210
+			private var _currentStation : TrainStation;
+			
+			public function get currentStation() : TrainStation
+			{
+				return _currentStation;
+			}
+			
+			public function set currentStation(value:TrainStation):void
+			{
+				_currentStation = value;
+				
+			}
+			
+			// Add by chenjun 20141213
+			// 记录环线标志是否被改动，默认未被改动，当是最后一圈时改变环线标志0为1
+			private var _isRingChanged : Boolean = false;
+			
+			public function get isRingChanged() : Boolean
+			{
+				return _isRingChanged;
+			}
+			
+			public function set isRingChanged(value:Boolean):void
+			{
+				_isRingChanged = value;
+				
+			}
+			
+			// Add by chenjun 20141213
+			// 记录4号线是否是最后一圈的最后一站
+			private var _isLastStation : Boolean = false;
+			
+			public function get isLastStation() : Boolean
+			{
+				return _isLastStation;
+			}
+			
+			public function set isLastStation(value:Boolean):void
+			{
+				_isLastStation = value;
+				
+			}
+			
+			/**
+			 * 下一站箭头闪烁
+			 */
+			private function playEffect(sr : StationRenderer) : void
+			{
+				if(sr.railSprite)
+				{
+					sr.railSprite.fills = sr.R_COLORS;
+	
+					simple.valueFrom = 0;
+					simple.valueTo = sr.railSprite.rails.length;
+					
+					stopEffect();
+					
+					animate.duration = (sr.dir == DisplayDir.Right || sr.dir == DisplayDir.Left) ? 1000 : 2000;
+					animate.target = sr.railSprite;
+					animate.addEventListener(EffectEvent.EFFECT_END,playHandler);
+					animate.play();
+				}
+			}
+			
+			
+			private function playHandler(event : Event) : void
+			{
+				animate.play();
+			}
+			
+			public function stopEffect() : void
+			{
+				animate.target = null;
+				animate.removeEventListener(EffectEvent.EFFECT_END,playHandler);
+				animate.stop();
+			}
+			
+			public var itemWidth : Number;
+			
+			public var itemHeight : Number;
+			
+			
+			private var _dataProvider : Array;
+			
+			private var _dataProviderChanged : Boolean;
+
+			public function get dataProvider() : Array
+			{
+				return _dataProvider;
+			}
+			
+			protected override function commitProperties(): void
+			{
+				super.commitProperties();
+			
+				var rennderer : IStation;
+				/**
+				 * 
+				 *  加载线路
+				 * 
+				 * */
+				if(_dataProviderChanged)
+				{
+					_dataProviderChanged = false;
+					_trainLine = AppCache.Lines.find(("Line_" + _line + "_" + _dir).toUpperCase());
+					_dataProvider = getDataProvider();
+					
+					this.removeAllElements();
+					this.stations.clear();
+					// 绘制上下两条线路的站点信息
+					loadLineStations();
+					
+					dispatchEvent(new Event("dataLoaded"));
+				}
+				
+				
+				/**
+				 * 
+				 *  刷新线路
+				 * 
+				 * */				
+				if(_lineChanged)
+				{
+					_lineChanged = false;
+					reset();
+				}
+				
+				
+				/**
+				 * 
+				 *  越站处理
+				 * 
+				 * */					
+				if(_passStationChanged)
+				{
+					_passStationChanged = false;
+					
+					rennderer = stations.getObject(_passStation.StationId);
+					rennderer.displayMode = _passStation.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+					
+				}
+				
+				/**
+				 * 
+				 *  下一站处理
+				 * 
+				 * */					
+				if(_nextStationChanged)
+				{
+					_nextStationChanged = false;			
+					this.nextStationHandler();
+				}
+				
+				
+			}
+			
+			private function nextStationHandler():void {
+				
+				var rennderer : IStation;
+				
+				var currnetIndex : Number = _dataProvider.indexOf(_nextStation);
+				var startIndex : Number = _dataProvider.indexOf(startStation);
+				
+//				if(startIndex < 0) startIndex = 0;
+				
+				var trainStation : TrainStation;
+				
+				var passStations : Array = _dataProvider.slice(startIndex,currnetIndex);
+			
+				
+				var count : int = passStations.length;
+				
+				// 起始灰站位置
+				var passStartIndex : Number = 0;
+				
+				/**
+				 *  根据2014年11月需求，4号线如果灰站标识为1则起始站始终不灰，只灰掉起始站和当前站之间的站点
+				 */
+				if(isRing) 
+				{
+					if(!isRingChanged)
+					{
+						if(count < 3) 
+						{
+							var sum : int = _dataProvider.length;
+							passStations = passStations.concat(_dataProvider.slice(sum - (3 - count)));
+						}
+						else if(count > 3)
+						{
+							passStations = passStations.slice(currnetIndex - 3,currnetIndex);
+						}
+						count = 3;
+					}
+					else {
+					
+						if(currnetIndex == startIndex) {
+							passStations = _dataProvider.slice(startIndex);
+							count = passStations.length;
+						}				
+					}
+					
+				} 
+				else 
+				{
+					if(( _cmd == 2 || _cmd == 6 ) && _line == "4" && line4Flag == 1)
+					{
+						if(currnetIndex == startIndex) {
+							passStations = _dataProvider.slice(startIndex);
+							count = passStations.length;
+						}
+					}
+				}
+				
+				for (var i : Number = passStartIndex;i<count;i++)
+				{
+					trainStation = passStations[i];
+					
+					if(trainStation == _nextStation)
+						continue;
+					
+					rennderer = stations.getObject(trainStation.StationId);
+					
+					
+					if(rennderer) {
+						if(isRingChanged && line4Flag == 1 && (_cmd==2||_cmd==6) && _line=="4") 
+						{
+							if((trainStation != startStation))
+							{
+								rennderer.displayMode = DisplayMode.PASS;
+							} 
+						}
+						else 
+						{
+							
+							rennderer.displayMode = DisplayMode.PASS;
+						}
+					}
+					
+				}
+					
+					
+				
+				if(_cmd == 2){
+					rennderer = stations.getObject(_nextStation.StationId);
+					if(rennderer)
+					{
+						rennderer.displayMode = DisplayMode.NEXT;
+						playEffect(rennderer as StationRenderer);
+					}
+				}
+					
+					
+				dispatchEvent(new Event("nextStation"));			
+			}
+			
+			private function nextStationHandler2():void {
+				
+				var rennderer : IStation;
+				
+				var currnetIndex : Number = _dataProvider.indexOf(_nextStation);
+				var startIndex : Number = _dataProvider.indexOf(startStation);
+				
+				var trainStation : TrainStation;
+				var passStations : Array = null;
+				if(!isLastStation)
+				{
+					passStations = _dataProvider.slice(startIndex,currnetIndex);
+				} 
+				else
+				{
+					var endIndex : Number = _dataProvider.indexOf(_endStation);
+					passStations = _dataProvider.slice(startIndex,endIndex+1);
+				}
+				
+				var count : int = passStations.length;
+				
+				// 起始灰站位置
+				var passStartIndex : Number = 0;
+				
+				/**
+				 *  根据2014年11月需求，4号线如果灰站标识为1则起始站始终不灰，只灰掉起始站和当前站之间的站点
+				 */
+				if(isRing) 
+				{
+					if(!isRingChanged)
+					{
+						if(count < 3) 
+						{
+							var sum : int = _dataProvider.length;
+							passStations = passStations.concat(_dataProvider.slice(sum - (3 - count)));
+						}
+						else if(count > 3)
+						{
+							passStations = passStations.slice(currnetIndex - 3,currnetIndex);
+						}
+						count = 3;
+					}
+					
+				} 
+				else 
+				{
+					if((_cmd==2||_cmd==6) && _line=="4" && line4Flag == 1)
+					{
+						passStartIndex = 1;
+					}
+				}
+				
+				for (var i : Number = passStartIndex;i<count;i++)
+				{
+					trainStation = passStations[i];
+					
+					if(trainStation == _nextStation)
+						continue;
+					
+					rennderer = stations.getObject(trainStation.StationId);
+					
+					if(isRingChanged && line4Flag == 1 && (_cmd == 2 || _cmd == 6) && _line=="4") 
+					{
+						if(rennderer && (trainStation != startStation))
+						{
+							rennderer.displayMode = DisplayMode.PASS;
+						} 
+					}
+					else 
+					{
+						if(rennderer)
+						{
+							rennderer.displayMode = DisplayMode.PASS;
+						} 
+					}
+					
+				}	
+				
+				rennderer = stations.getObject(_nextStation.Name);
+				if(rennderer)
+				{
+					rennderer.displayMode = DisplayMode.NEXT;
+					playEffect(rennderer as StationRenderer);
+				}
+				
+				dispatchEvent(new Event("nextStation"));					
+			}
+
+			
+			//private var passTrainsStations : Array;
+			
+			
+			/**
+			 * 
+			 *  加载上下图像中的站点信息
+			 * 
+			 * */
+			protected function loadLineStations() : void
+			{
+			
+			   const rowCount : int = _trainLine.ShortNum == "4" ? 13 : 15;
+			   const evenOffsetX : Number = -10;//dir == Direction.UP && _runDir == 0 ? -10 : -115;
+				
+				ring.rowNumber = rowCount;
+				ring.evenOffsetX = evenOffsetX;
+
+				this.layout = ring;
+				
+				//passTrainsStations = new Array();
+				
+				var list : Array = _dataProvider.slice(0,rowCount);
+				addStationToMap(list,DisplayDir.Right);
+				
+				list = _dataProvider.slice(rowCount);
+				addStationToMap(list,DisplayDir.Left,true);	
+				
+			}
+			
+			// 添加站点信息至图像中
+			protected function addStationToMap(list : Array,dir : String,isUp : Boolean = false) : IStation
+			{
+				var nums : int = list.length;
+				var renderer : IStation;
+				var trainStaion : TrainStation;
+				
+				for (var i : int = 0;i<nums;i++)
+				{
+					trainStaion = list[i];
+					
+					renderer = createItemRenderer(trainStaion);
+					renderer.station = trainStaion;
+					renderer.line = _trainLine.ShortNum;
+					renderer.userLines = HelperUtils.getUserLines(trainStaion,_trainLine);
+					renderer.width = itemWidth;
+					renderer.height = itemHeight;	
+					renderer.dir = getDir(dir,(i == 0),(i == (nums - 1)));
+					renderer.isUp = renderer.dir == DisplayDir.LeftEnd ? false : isUp;
+					renderer.displayMode = renderer.station.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+
+					// 设置皮肤
+					setSkinClass(renderer);
+					
+					addElement(renderer);
+					
+					
+				}
+				
+				return renderer;
+			}
+			
+			private var _isRing : Number;
+
+			/**
+			 * 获得是否换线数据
+			 */
+			public function get isRing():Number
+			{
+				return _isRing;
+			}
+
+			/**
+			 * 设置是否换线数据
+			 * @private
+			 */
+			public function set isRing(value:Number):void
+			{
+				if(_isRing == value)
+					return;
+				
+				_isRing = value;
+				
+				_lineChanged = true;
+				_dataProviderChanged = true;
+				
+				invalidateProperties();				
+			}
+			
+			private var _line4Flag : Number;
+			
+			/** 灰站标识   */
+			public function get line4Flag():Number
+			{
+				return _line4Flag;
+			}
+			
+			/**
+			 * @private
+			 */
+			public function set line4Flag(value:Number):void
+			{
+				if(_line4Flag == value)
+					return;
+				
+				_line4Flag = value;			
+			}
+			
+			protected function getDir(meDir : String,isStart : Boolean,isEnd : Boolean) : String
+			{
+				
+				if(meDir == DisplayDir.Left)
+				{
+					if(isStart)
+					{
+						return DisplayDir.Down;
+					}
+				}
+				else
+				{
+					if(isStart)
+					{
+						if(isFixRing()){
+							return DisplayDir.DownReFix;
+						}else{
+							return isRing ? DisplayDir.DownRe : DisplayDir.NoRail;
+						}
+					}
+				}	
+				
+				return meDir;
+				
+				
+//				if(dir == Direction.UP)
+//				{
+//					if(meDir == DisplayDir.Left)
+//					{
+//						if(isStart)
+//						{
+//							return DisplayDir.Down;
+//						}
+//					}
+//					else
+//					{
+//						if(isStart)
+//						{
+//							return isRing ? DisplayDir.DownRe : DisplayDir.NoRail;
+//						}
+//					}	
+//
+//					return meDir;
+//				}
+//				else
+//				{
+//					if(meDir == DisplayDir.Left)
+//					{
+//						if(isEnd)
+//						{
+//							return isRing ? DisplayDir.UpRe : DisplayDir.NoRail;
+//						}
+//					}
+//					else
+//					{
+//						if(isEnd)
+//						{
+//							return DisplayDir.Up;
+//						}
+//					}	
+//					
+//					return meDir == DisplayDir.Left ? DisplayDir.Right : DisplayDir.Left;
+//				}
+
+			}
+			
+			private function isFixRing():Boolean{
+				if(fixRing){
+					var startIndex : int = _trainLine.StationList.indexOf(_dataProvider[0]);
+					var endIndex : int = _trainLine.StationList.indexOf(_dataProvider[_dataProvider.length-1]);
+					if((endIndex+1) % _trainLine.StationList.length == startIndex){
+						return true;
+					}
+//					if(startIndex == 0 && endIndex == _trainLine.StationList.length - 1) return true;
+				}
+				
+				return false;
+			}
+			
+
+			private var _itemRenderer : IFactory = new ClassFactory(StationRenderer);
+
+			public function get itemRenderer():IFactory
+			{
+				return _itemRenderer;
+			}
+
+			public function set itemRenderer(value:IFactory):void
+			{
+				if(_itemRenderer != value)
+				{
+					_itemRenderer = value;
+				}
+			}
+
+			
+
+			private function createItemRenderer(station : TrainStation) : IStation
+			{
+				var myItemRenderer : IStation;
+				
+				if(!myItemRenderer && itemRenderer)
+					myItemRenderer = itemRenderer.newInstance() as IStation;
+				
+				if(!myItemRenderer)
+					myItemRenderer = new StationRenderer();
+				
+				myItemRenderer.station = station;
+							
+				stations.put(station.StationId,myItemRenderer);
+				
+				return myItemRenderer;
+			}
+			
+			/**
+			 * 根据方向设置皮肤
+			 */
+			private function setSkinClass(renderer : IStation) : void
+			{
+				var ui : UIComponent = renderer as UIComponent;
+				
+				var skinClass : Class;
+				switch(renderer.dir)
+				{
+					case DisplayDir.NoRail : 
+					{
+						renderer.isStart = true;
+						skinClass = Class(com.missiongroup.car.skins.NoRailStationRendererSkin);
+						break;
+					}
+					case DisplayDir.Right : 
+					{
+						renderer.rails = RailUtils.nRightPoints;
+						skinClass = Class(com.missiongroup.car.skins.RightStationRendererSkin);
+						break;
+					}
+					case DisplayDir.Down : 
+					{
+						renderer.rails = RailUtils.nDownPoints;
+						skinClass = Class(com.missiongroup.car.skins.DownStationRendererSkin);
+						break;
+					}
+					case DisplayDir.DownRe : 
+					{
+						renderer.isStart = true;
+						renderer.rails = RailUtils.nDownPoints;
+						skinClass = Class(com.missiongroup.car.skins.DownReStationRendererSkin);
+						break;
+					}
+					case DisplayDir.DownReFix:
+						renderer.isStart = true;
+						renderer.rails = RailUtils.nDownPoints;
+						renderer.displayMode = DisplayMode.PASS;
+						skinClass = Class(com.missiongroup.car.skins.DownReStationRendererSkin);
+						break;
+					case DisplayDir.Up : 
+					{
+						renderer.rails = RailUtils.nUpPoints;
+						skinClass = Class(com.missiongroup.car.skins.UpStationRendererSkin);
+						break;
+					}
+					case DisplayDir.UpRe : 
+					{
+						renderer.isStart = true;
+						renderer.rails = RailUtils.nUpPoints;
+						skinClass = Class(com.missiongroup.car.skins.UpReStationRendererSkin);
+						break;
+					}
+					case DisplayDir.LeftEnd:
+						renderer.rails = RailUtils.getLeftEndPoints();
+						skinClass = Class(com.missiongroup.car.skins.LeftEndStationRenderSkin);
+						break;
+					default :
+					{
+						renderer.rails = RailUtils.nRightPoints;
+						skinClass = Class(com.missiongroup.car.skins.LeftStationRendererSkin);
+						break;
+					}
+				}	
+				
+				if(skinClass)
+				{
+					ui.setStyle('skinClass',skinClass);
+				}
+			}
+
+			
+			private function reset() : void
+			{
+				var renderers : Array = stations.values();
+				
+				
+				
+				var length : int = renderers.length;
+				var startIndex : int = _startStation ? _dataProvider.indexOf(_startStation) : 0;
+				var endIndex : int = _endStation ? _dataProvider.indexOf(_endStation) : _dataProvider.length - 1;
+				trace("RESET>>>>> renderers=="+ renderers+",length=="+length+",startIndex=="+startIndex+",endIndex=="+endIndex);
+				var currentIndex : int = 0;
+				var i : int = 0;
+				
+				
+				if(_nextStation) {
+					var renderer : IStation = stations.getObject(_nextStation.StationId);
+					if(renderer) {
+						renderer.displayMode = DisplayMode.NORMAL;
+					}
+				}
+				
+				
+				if(endIndex > startIndex) 
+				{
+					for (i = 0;i < length;i++)
+					{
+						renderer = stations.getObject(_dataProvider[i].StationId);
+						currentIndex = _dataProvider.indexOf(renderer.station);
+						renderer.displayMode = currentIndex >= startIndex && currentIndex <= endIndex ?
+							renderer.station.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL : DisplayMode.PASS;
+					}
+				}
+				else if(startIndex > endIndex)
+				{
+					for (i = length - 1;i >= 0;i--)
+					{
+						renderer = stations.getObject(_dataProvider[i].StationId);
+						currentIndex = _dataProvider.indexOf(renderer.station);
+						renderer.displayMode = currentIndex >= endIndex && currentIndex <= startIndex ?
+							renderer.station.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL : DisplayMode.PASS;
+					}					
+				}
+			}
+			
+			
+			public function clear(isPassReset : Number = 0) : void
+			{
+				var renderers : Array = stations.values()
+				for each(var renderer : IStation in renderers) {
+					
+					if(renderer.station.IsPass && isPassReset)
+						renderer.station.IsPass = false;
+					
+					renderer.displayMode = renderer.station.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+				}
+			}
+			
+			private var _passStation : TrainStation;
+			private var _passStationChanged : Boolean;
+
+			public function get passStation():TrainStation
+			{
+				return _passStation;
+			}
+
+			public function set passStation(value:TrainStation):void
+			{
+				_passStation = value;
+				_passStationChanged = true;
+				
+				invalidateProperties();
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Metadata>
+		[Event(name="dataLoaded", type="flash.events.Event")]
+		[Event(name="nextStation", type="flash.events.Event")]
+	</fx:Metadata>
+	
+	<fx:Declarations>
+		
+		<layout:RingRailLayout id="ring" snakeRowHeight="78" 
+							   offsetY="25" offsetX="20"/>
+		
+		<s:Animate id="animate" duration="1000">
+			<s:motionPaths>
+				<s:SimpleMotionPath id="simple" property="index" valueBy="1" />
+			</s:motionPaths>
+		</s:Animate>
+		
+		
+	</fx:Declarations>
+	
+</s:Group>

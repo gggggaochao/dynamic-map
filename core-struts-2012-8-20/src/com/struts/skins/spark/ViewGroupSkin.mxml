@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+    ADOBE SYSTEMS INCORPORATED
+    Copyright 2008 Adobe Systems Incorporated
+    All Rights Reserved.
+
+    NOTICE: Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the license agreement accompanying it.
+
+-->
+
+<!--- The default skin class for a Spark SkinnableContainer container.  
+
+     @see spark.components.SkinnableContainer
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:Skin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" 
+    xmlns:fb="http://ns.adobe.com/flashbuilder/2009" alpha.disabled="0.5">
+	<fx:Metadata>[HostComponent("com.struts.components.ViewGroup")]</fx:Metadata>
+
+    <fx:Script fb:purpose="styling">
+        <![CDATA[         
+			import mx.graphics.GradientEntry;
+			import mx.graphics.LinearGradient;
+            /**
+             *  @private
+             */
+            override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number) : void
+            {
+				if(!isNaN(getStyle("headerHeight")))
+				{
+					headGroup.height = getStyle("headerHeight");
+					contentGroup.top = headGroup.height;
+				}
+				
+				var isStrokeVisible : Boolean = getStyle("strokeVisible");
+				if(isStrokeVisible)
+				{
+					if (!isNaN(getStyle("strokeColor")))
+					{
+						bgBorder.color = getStyle("strokeColor");
+					}
+				}
+				else
+				{
+					border.visible = false;
+				}
+				
+				if(!isNaN(getStyle("cornerRadius")))
+				{
+					var cornerRadius : Number = getStyle("cornerRadius");
+					
+					headBackgroud.topLeftRadiusX = cornerRadius;
+					headBackgroud.topLeftRadiusY = cornerRadius;
+					headBackgroud.topRightRadiusX = cornerRadius;
+					headBackgroud.topRightRadiusY = cornerRadius;
+					
+					background.radiusX = cornerRadius;
+					background.radiusY = cornerRadius;
+				}
+				
+                if (isNaN(getStyle("backgroundColor")))
+                {
+                    background.visible = false;
+                }
+                else
+                {
+                    background.visible = true;
+                    bgFill.color = getStyle("backgroundColor");
+                    bgFill.alpha = getStyle("backgroundAlpha");
+                }
+                
+				var headerColors : Array = getStyle("headerColors");
+				
+				if(headerColors && headerColors.length > 1)
+				{
+					var entries : Array = [];
+					var linearGradient : LinearGradient = new LinearGradient();
+					linearGradient.rotation = 90;
+					
+					for each(var vo : * in headerColors)
+					{
+						var color : uint = uint(vo);
+						var ge : GradientEntry = new GradientEntry(color);
+						entries.push(ge);
+					}
+					linearGradient.entries = entries;
+					
+					headBackgroud.fill = linearGradient;
+				}
+				else
+				{
+					headBackgroud.fill = lineFill;
+				}
+				
+                super.updateDisplayList(unscaledWidth, unscaledHeight);
+            }
+        ]]>        
+    </fx:Script>
+  
+	<fx:Declarations>
+		<s:LinearGradient id="lineFill" rotation="90">
+			<s:GradientEntry color="#efefef" />
+			<s:GradientEntry color="#c1c1c1"/>
+		</s:LinearGradient>		
+	</fx:Declarations>
+	
+    <s:states>
+        <s:State name="normal" />
+        <s:State name="disabled" />
+    </s:states>
+    
+    <!--- Defines the appearance of the SkinnableContainer class's background. -->
+    <s:Rect id="background" left="0" right="0" top="0" bottom="0">
+        <s:fill>
+            <!--- @private -->
+            <s:SolidColor id="bgFill" color="#FFFFFF"/>
+        </s:fill>
+    </s:Rect>
+
+	<s:Rect id="border" left="0" right="0" top="0" bottom="0">
+		<s:stroke>
+			<s:SolidColorStroke id="bgBorder" color="#c1c1c1" />
+		</s:stroke>
+	</s:Rect>
+	
+	<s:Group id="headGroup" left="0" right="0" top="0" height="28">
+		<s:Rect id="headBackgroud" left="0" right="0" top="0" bottom="0" />
+		
+		<s:Label id="titleDisplay"
+				 textAlign="right" fontWeight="normal"
+				 verticalAlign="middle"
+				 maxDisplayedLines="1" fontSize="12" color="0xFFFFFF"
+				 verticalCenter="0" left="10">
+			<s:filters>
+				<s:GlowFilter blurX="6" blurY="6" color="0x000000" quality="2" strength="1"/>
+			</s:filters>
+		</s:Label>
+		
+	</s:Group>
+    <!--
+        Note: setting the minimum size to 0 here so that changes to the host component's
+        size will not be thwarted by this skin part's minimum size.   This is a compromise,
+        more about it here: http://bugs.adobe.com/jira/browse/SDK-21143
+    -->
+    <!--- @copy spark.components.SkinnableContainer#contentGroup -->
+    <s:Group id="contentGroup" left="1" right="1" top="30" bottom="1" minWidth="0" minHeight="0">
+        <s:layout>
+            <s:BasicLayout/>
+        </s:layout>
+    </s:Group>
+
+</s:Skin>

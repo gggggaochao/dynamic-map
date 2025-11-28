@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+    ADOBE SYSTEMS INCORPORATED
+    Copyright 2008 Adobe Systems Incorporated
+    All Rights Reserved.
+
+    NOTICE: Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the license agreement accompanying it.
+
+-->
+
+<!--- The default skin class for the Spark Button component.  
+
+       @see spark.components.Button
+        
+      @langversion 3.0
+      @playerversion Flash 10
+      @playerversion AIR 1.5
+      @productversion Flex 4
+-->
+<s:SparkButtonSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+             xmlns:s="library://ns.adobe.com/flex/spark" 
+             xmlns:fb="http://ns.adobe.com/flashbuilder/2009"
+             minWidth="16" minHeight="16" 
+             alpha.disabled="0.5">
+	<fx:Metadata>
+		[HostComponent("com.struts.components.mtreeClasses.TreeNodeButton")]
+	</fx:Metadata>
+     
+    <fx:Script fb:purpose="styling">
+        <![CDATA[         
+            import spark.components.Group;                 
+        ]]>        
+    </fx:Script>
+        
+	<fx:Declarations>
+		<s:GlowFilter id="glow" color="0x16c8f5" />
+	</fx:Declarations>
+    <!-- states -->
+    <s:states>
+		<s:State name="up" />
+		<s:State name="over" stateGroups="overStates" />
+		<s:State name="down" stateGroups="downStates" />
+		<s:State name="disabled" stateGroups="disabledStates" />
+		
+		<s:State name="upAndOpen" stateGroups="openStates" />
+		<s:State name="overAndOpen" stateGroups="overStates, openStates" />
+		<s:State name="downAndOpen" stateGroups="downStates, openStates" />
+		<s:State name="disabledAndOpen" stateGroups="disabledStates, openStates" />
+    </s:states>
+	
+	<s:Rect width="100%" height="100%">
+		<s:fill>
+			<s:SolidColor color="0" alpha="0" />
+		</s:fill>
+	</s:Rect>
+	
+	<s:Path width="7" height="7" 
+			horizontalCenter="0" verticalCenter="0"
+			data="M 0 0 L 6 3 L 0 6 Z"
+			data.openStates="M 0 6 L 6 6 L 6 0 Z">
+		<s:fill>
+			<s:LinearGradient>
+				<s:GradientEntry color="0xefefef" color.upAndOpen="0x999999" color.overStates="0x2bb8e3"/>
+				<s:GradientEntry color="0xffffff" color.upAndOpen="0x333333" color.overStates="0x2bb8e3"/>
+			</s:LinearGradient>
+		</s:fill>
+		<s:stroke>
+			<s:SolidColorStroke color="0x999999" color.overStates="0x2b99e3" />
+		</s:stroke>
+		<s:filters>
+			<s:GlowFilter color="0xefefef" color.overStates="0x2b99e3" strength.overStates="2" blurX="4" blurY="4" />
+		</s:filters>
+	</s:Path>
+    
+</s:SparkButtonSkin>

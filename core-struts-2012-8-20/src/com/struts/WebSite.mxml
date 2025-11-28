@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009"
+                xmlns:s="library://ns.adobe.com/flex/spark"
+                xmlns:mx="library://ns.adobe.com/flex/mx"
+                width="100%" height="100%"   
+		        creationComplete="init()" 
+			    xmlns:core="com.core.*">
+	
+<fx:Script>
+    <![CDATA[
+		import com.logging.Logger;
+		import com.logging.LoggerHandlerAction;
+		import com.logging.LoggerManager;
+		import com.struts.components.TipTool;
+		import com.struts.core.AppSettings;
+		import com.struts.core.EventBus;
+		import com.struts.core.ModuleConf;
+		import com.struts.core.StringBundle;
+		import com.struts.core.WebApp;
+		import com.struts.entity.SystemInfo;
+		import com.struts.events.AppEvent;
+		import com.struts.managers.Ani18NManager;
+		import com.struts.managers.ComponentsManager;
+		import com.struts.managers.ConfigManager;
+		import com.struts.managers.Global;
+		import com.struts.managers.ReflectionClassManager;
+		import com.struts.managers.UIManager;
+		
+		import flash.utils.setTimeout;
+		
+		import mx.controls.Alert;
+		import mx.core.FlexGlobals;
+		import mx.core.IVisualElement;
+		import mx.core.IVisualElementContainer;
+		import mx.events.ModuleEvent;
+		import mx.logging.Log;
+		import mx.logging.LogEventLevel;
+		import mx.logging.targets.TraceTarget;
+		import mx.managers.PopUpManager;
+		import mx.modules.IModuleInfo;
+		import mx.modules.ModuleManager;
+		
+		import spark.components.Group;
+
+		
+		
+		public static const CONFIGMARKS : String = "londConfigmarks";
+		
+        public static const CONTAINER_INITIALIZED:String = "containerInitilized";
+
+		private static var _site : WebSite;
+		
+		private static var _lock : Boolean = false;
+		
+		
+		private var isGlobalEnd : Boolean = false;
+		/**
+		 * 
+		 * 用户当前会话对象
+		 * 
+		 * */
+		public static var Session : *;
+		
+		
+		public static var System : SystemInfo;
+		//private var _siteEventDispatcher:EventBus;
+		
+		
+		public var refClass : ReflectionClassManager;
+		//public var record : DataManager;
+		
+		public var caches : Array;
+		
+		public var skins : UIManager;
+		
+		public var components : ComponentsManager;
+		
+		public var i18n : Ani18NManager;
+
+        public var config : ConfigManager;
+
+		public var global : Global;		
+		
+		public var logger : Logger;
+
+        private function init():void
+        {
+            _site = this;
+            _lock = true; 
+
+            //initLogging();
+
+            WebSite.addEventListener(AppEvent.APP_ERROR, errorHandler);
+			WebSite.addEventListener(AppEvent.SKINS_LOADED, skinHandler);
+			WebSite.addEventListener(AppEvent.CONFIG_LOADED, configLoadComplateHandler);
+			WebSite.addEventListener(AppEvent.INIT_CACHEDATA_LOADED,initCacheDataHandler);
+
+			load();
+
+        }
+		
+		private function load() : void
+		{
+			if(i18n)
+			{
+				WebSite.addEventListener(AppEvent.LANGUAGE_CUT_COMPLATE,initlanguageCompleteHanlder);
+				i18n.load();
+			}
+			else
+			{
+				WebSite.dispatch(AppEvent.SKINS_INITIALIZED);
+			}
+		}
+
+		private function initlanguageCompleteHanlder(event : Event) : void
+		{
+			WebSite.removeEventListener(AppEvent.LANGUAGE_CUT_COMPLATE,initlanguageCompleteHanlder);
+
+			WebSite.dispatch(AppEvent.SKINS_INITIALIZED);
+		}
+		
+
+		/**
+		 * 
+		 * 配置文件加载完成事件
+		 * 
+		 * */
+		private function configLoadComplateHandler(event : AppEvent)  : void
+		{
+			/**
+			 *  加载缓存数据，该数据是全局共享数据
+			 * 
+			 * */
+			if(caches && caches.length)
+			{
+				AppSettings.start(caches);
+			}
+			
+			/**
+			 *  程序启动前运行接口
+			 *  可执行数据初始化工作
+			 * 
+			 * */
+			else if(global && isGlobalEnd == false)
+			{			
+				isGlobalEnd = true;
+				global.start();
+			}
+			
+			
+			else
+			{
+				initializeComponents();
+			}
+		}		
+		
+		private function initCacheDataHandler(event : Event) : void
+		{
+			configLoadComplateHandler(null);
+		}
+		
+		
+		/**
+		 *  开始加载组件
+		 * 
+		 * */
+		public static function initializeComponents() : void
+		{
+			WebSite.dispatch(AppEvent.COMPONENTS_INITIALIZED);
+		}
+		
+		
+		/**
+		 * 	加载皮肤属性完毕后，加载页面控件
+		 * 
+		 * */
+		private function skinHandler(event:AppEvent) : void
+		{	
+			WebSite.dispatch(WebSite.CONTAINER_INITIALIZED);
+		}
+		
+        private  function loadConfig():void
+        {
+            if (!ExternalInterface.available)
+            {
+                return;
+            }
+
+//            var flashvarConfig:String = FlexGlobals.topLevelApplication.parameters.config;
+//            if (flashvarConfig)
+//            {
+//				if(config)
+//					config.configFile = flashvarConfig;
+//            }
+			
+			var configObject : SharedObject = SharedObject.getLocal(CONFIGMARKS);
+			if(configObject.size > 0)
+			{
+				var configData : Object = configObject.data[CONFIGMARKS];
+				if(configData)
+				{
+					if(configData.skins)
+					{
+						if(skins)
+							skins.skinsFile = configData.skins;
+					}
+					if(configData.config)
+					{
+						if(config)
+							config.configFile = configData.config;
+					}
+				}
+			}
+
+            try
+            {
+                var queryStringFromUrl:String = ExternalInterface.call("window.location.search.substring", 1);
+				
+                if (queryStringFromUrl)
+                {
+                    var params:Array = queryStringFromUrl.split('&');
+                    var length:uint = params.length;
+
+                    for (var i:uint = 0, index:int = -1; i < length; i++)
+                    {
+                        var kvPair:String = params[i];
+                        if ((index = kvPair.indexOf("=")) > 0)
+                        {
+                            var key:String = kvPair.substring(0, index);
+                            var value:String = kvPair.substring(index + 1);
+                        }
+                        if (key == "config")
+                        {
+							if(config)
+								config.configFile = value;
+                        }
+						else if (key == "skins")
+						{
+							if(skins)
+								skins.skinsFile = value;
+						}
+                    }
+                }
+				
+				
+            }
+            catch (error:Error)
+            {
+                showError("Some error occured.");
+            }
+        }
+
+        private var isAddChild:Boolean = true;
+
+        protected override function commitProperties():void
+        {
+            super.commitProperties();
+			
+			if (isAddChild)
+			{
+
+				loadConfig();
+			    LoggerManager.logger = logger || new LoggerHandlerAction();
+				LoggerManager.logger.initLogging();
+				
+				if(components)
+				   addElement(components);
+				
+				isAddChild = false;
+				
+			}				
+        }
+
+
+        private function errorHandler(event:AppEvent):void
+        {
+			
+        }
+
+        public static function getInstance() : WebSite
+        {
+            if (!_lock)
+            {
+                _site = new WebSite();
+                _lock = true;
+            }
+            return _site;
+        }
+
+        public static function addEventListener(type:String, listener:Function, useCapture:Boolean = false, priority:int = 0, useWeakReference:Boolean = false):void
+        {
+			WebApp.addEventListener(type, listener, useCapture, priority, useWeakReference);
+        }
+
+		public static function hasEventListener(type:String) : Boolean
+		{
+			return WebApp.hasEventListener(type);
+		}
+		
+        public static function removeEventListener(type:String, listener:Function, useCapture:Boolean = false):void
+        {
+			WebApp.removeEventListener(type, listener, useCapture);
+        }
+
+        public static function dispatch(message:String):Boolean
+        {
+            return WebApp.dispatch(message);
+        }
+
+        public static function dispatchEvent(event:Event):Boolean
+        {
+            return WebApp.dispatchEvent(event);
+        }
+
+        public static function showError(value:String):void
+        {
+            dispatchEvent(new AppEvent(AppEvent.APP_ERROR, value));
+        }
+		
+		
+		/**
+		 *   保存共享数据
+		 * */
+		public static function addShareData(key : String,object : *) : void
+		{
+			AppSettings.addData(key,object);
+		}
+		
+		/**
+		 *   读取共享数据
+		 * */		
+		public static function fetchShareData(key : String) : *
+		{
+			return AppSettings.fetchData(key);
+		}
+		
+		
+		public static function addView(ele : IVisualElement) : void
+		{
+			if(getInstance().components)
+			{
+				getInstance().components.viewers.push(ele);	
+			}
+		}
+		
+		/**
+		 *  显示提示
+		 * 
+		 * */
+		public static function tip(msg : String,
+								   autoClear : Boolean = true,
+								   offset : Number = 20,
+								   showMode : String = "top",
+								   parentEle : IVisualElementContainer = null) : void
+		{
+			WebApp.tip(msg,autoClear,offset,showMode,parentEle);
+		}
+		
+
+		/**
+		 *  清空提示
+		 * 
+		 * */
+		public static function clearTip() : void
+		{
+			WebApp.clearTip();
+		}
+		
+		
+    ]]>
+</fx:Script>
+
+<fx:Declarations>
+	<core:GlobalExceptionHandler preventDefault="true" />
+</fx:Declarations>
+	
+</s:SkinnableContainer>

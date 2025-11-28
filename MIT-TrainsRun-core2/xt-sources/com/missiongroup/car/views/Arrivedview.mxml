@@ -1,0 +1,840 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Script>
+		<![CDATA[
+			import com.missiongroup.car.componets.ArrivedStationRenderer;
+			import com.missiongroup.car.componets.StationRenderer;
+			import com.missiongroup.car.consts.DisplayDir;
+			import com.missiongroup.car.consts.DisplayMode;
+			import com.missiongroup.car.core.IStation;
+			import com.missiongroup.car.skins.ArrivedLeftStationRendererSkin;
+			import com.missiongroup.car.skins.ArrivedNoRailStationRendererSkin;
+			import com.missiongroup.car.skins.ArrivedRightStationRendererSkin;
+			import com.missiongroup.car.skins.LeftStationRendererSkin;
+			import com.missiongroup.car.skins.RightStationRendererSkin;
+			import com.missiongroup.car.utils.HelperUtils;
+			import com.missiongroup.car.utils.RailUtils;
+			import com.missiongroup.metro.command.consts.Direction;
+			import com.missiongroup.metro.core.AppCache;
+			import com.missiongroup.metro.entities.TrainLine;
+			import com.missiongroup.metro.entities.TrainStation;
+			import com.struts.utils.HashTable;
+			import flash.utils.setTimeout;
+			import mx.core.UIComponent;
+			import mx.events.EffectEvent;
+//			
+//			
+//			private static const cacheStations : HashTable = new HashTable();
+//			
+//			public static function initCacheStation(_line : String) : void 
+//			{
+//				var lineKey : String = ("Line_" + _line + "_up").toUpperCase();
+//				var _trainLine : TrainLine = AppCache.Lines.find(lineKey);
+//				var nums : int = _trainLine.StationList.length;
+//				var trainStaion : TrainStation;
+//				for (var i : int = 0;i<nums;i++)
+//				{
+//					trainStaion = _trainLine.StationList[i];
+//				
+//				}
+//			}
+			
+			private var _startStation:TrainStation;
+
+			public function get endStation():TrainStation
+			{
+				return _endStation;
+			}
+
+			public function set endStation(value:TrainStation):void
+			{
+				if(_endStation == value)
+					return;
+				
+				_endStation = value;
+				_dataProviderChanged = true;
+				
+				invalidateProperties();
+			}
+
+			public function set doorDir(value:Number):void
+			{
+				this.currentState = value ? "open" : "close";
+			}
+
+			
+			private var _itemRenderer : IFactory = new ClassFactory(ArrivedStationRenderer);
+			
+			public function get itemRenderer():IFactory
+			{
+				return _itemRenderer;
+			}
+			
+			public function set itemRenderer(value:IFactory):void
+			{
+				if(_itemRenderer != value)
+				{
+					_itemRenderer = value;
+				}
+			}
+			
+			private var _trainLine : TrainLine;
+			
+			public function get trainLine():TrainLine
+			{
+				return _trainLine;
+			}
+			
+			// Add by chenjun 20141213 
+			// 4号线最后一圈最后一战到站标志
+			private var _isLastStation : Boolean = false;
+			
+			public function get isLastStation():Boolean
+			{
+				return _isLastStation;
+			}
+			
+			public function set isLastStation(value:Boolean):void
+			{
+				_isLastStation = value;
+			}
+			
+			// Add by chenjun 20141213 
+			// 4号线最后一圈标志
+			private var _isLast : Boolean = false;
+			
+			public function get isLast():Boolean
+			{
+				return _isLast;
+			}
+			
+			public function set isLast(value:Boolean):void
+			{
+				_isLast = value;
+			}
+			
+			[Bindable]
+			private var _fontColor : uint;
+			
+			public var dir : String;
+			
+			public var isRing : Number;
+			
+			private var _line : String;
+
+			public function get line():String
+			{
+				return _line;
+			}
+			
+			public function set line(value:String):void
+			{
+				_line = value;
+				
+				_fontColor = value ==  "3" ? 0xe61e38 : 0x0670b8;
+				_trainLine = AppCache.Lines.find(("Line_" + _line + "_" + dir).toUpperCase());				   
+			}
+			
+			//public var startStation : TrainStation;
+
+			[Bindable]
+			private var CHANGE_LINE_INFO : String;
+			[Bindable]
+			private var SHOW_ARRIVE_INFO:Boolean = true;
+			[Bindable]
+			private var SHOW_NEXT_INFO:Boolean = true;
+			[Bindable]
+			private var NEXT_BG_SOURCE:String = 'assets/skins/next_line.png';
+			
+			private var _endStation : TrainStation;
+			
+			private var _arrivedStation : TrainStation;
+			
+			private var _nextStation:TrainStation;
+
+			
+			public function get arrivedStation() : TrainStation
+			{
+				return _arrivedStation;
+			}
+
+			public function set arrivedStation(value:TrainStation):void
+			{
+				
+				_arrivedStation = value;
+				_nextStation = null;
+				
+				
+				var changeLines : Array = HelperUtils.getUserLines(_arrivedStation,_trainLine);
+				
+				
+				CHANGE_LINE_INFO = changeLines ? "可换乘 " + changeLines.join("、") + "号线" : "";
+				
+
+				// 检查并替换 "jinshan" 为 "金山铁路",没有金山就在末尾加 "号线"
+				if (CHANGE_LINE_INFO.indexOf("jinshan") != -1) {
+					CHANGE_LINE_INFO = CHANGE_LINE_INFO.replace(/jinshan/g, "金山铁路");
+					CHANGE_LINE_INFO = CHANGE_LINE_INFO.replace(/号线/g, "");
+				}
+
+				var count : Number = _trainLine.StationList.length;
+				var index : Number = _trainLine.StationList.indexOf(_arrivedStation);
+				var startIndex:int = _trainLine.StationList.indexOf(_startStation);
+				var endIndex:int = _trainLine.StationList.indexOf(_endStation);
+				//var _startIndex : Number = dir == Direction.UP ? index - 1 : index - 3;
+				//var _endIndex : Number = dir == Direction.UP ? index + 4 : index + 2;
+
+				var _startIndex : Number = index - 1;
+				var _endIndex : Number = index + 4;
+				
+				
+				var _stations : Array; 
+				if(isRing)
+				{
+					var _temp : Array;
+					var joinCount : Number; 
+					if(_startIndex < 0)
+					{
+						joinCount = Math.abs(0 - _startIndex);
+						_stations = _trainLine.StationList.slice(count - joinCount,count);
+						_temp = _trainLine.StationList.slice(0,_endIndex);
+						
+						_stations = _stations.concat(_temp);
+					}
+					else if(_endIndex > count)
+					{
+						joinCount = Math.abs(count - _endIndex);
+						
+						_stations = _trainLine.StationList.slice(0,joinCount);
+						_temp = _trainLine.StationList.slice(_startIndex,count);
+						
+						_stations = _temp.concat(_stations);
+					}
+					//4 4 0 1 19 1a 1a 0 0 0 0 0 2 1 0 0
+					else
+					{
+						
+						_stations = _trainLine.StationList.slice(_startIndex,_endIndex);
+					}
+				}
+				else
+				{
+					
+					if(_startIndex < 0)
+					{
+						_startIndex = 0;
+						_endIndex = 5;
+					}
+					else if(_endIndex > count)
+					{
+						_startIndex = count - 5;
+						_endIndex = count;
+					}	
+					
+					
+					_stations = _trainLine.StationList.slice(_startIndex,_endIndex);
+					
+					
+					
+					if(_isLast && _endIndex == count && index > 1) {
+						_stations.shift();
+						_stations.push(_trainLine.StationList[0]);
+					}else{
+						
+						//当起始站大于到终点时的处理(出库)
+						if(dir == 'up' && startIndex > endIndex && endIndex == index){
+							_stations = [];
+							_startIndex = index - 4;
+							if(_startIndex < 0){
+								for(var i:int = count + _startIndex ; i < count ; i++){
+									_stations.push(_trainLine.StationList[i]);
+								}
+							}
+							_endIndex = index;
+							for(var j:int = 0 ; j <= _endIndex ; j++){
+								_stations.push(_trainLine.StationList[j]);
+							}
+						}
+						
+						if(_endIndex == count && index > 1 && endIndex != -1){
+							for(var i:int ; i < endIndex+1 ; i++){
+								_stations.shift();
+								_stations.push(_trainLine.StationList[i]);
+							}
+						}
+					}
+					
+//					if(isLast && _endIndex == count && Direction.UP == this.dir){
+//						_stations = _trainLine.StationList.slice(_startIndex,_endIndex);
+//					}
+//					else {
+//						_stations = _trainLine.StationList.slice(_startIndex,_endIndex);						
+//					}
+					
+					var removeIndex : int =  _stations.indexOf(_endStation);
+					
+					if(removeIndex > 0) {
+
+						var removeCount : int = 5 - removeIndex - 1;
+						
+						if(removeCount>0){
+							
+							_stations.splice(removeIndex+1,removeCount);
+								
+							var eIndex : int = _trainLine.StationList.indexOf(_stations[0]);
+							_stations = getStations(eIndex,removeCount,count).concat(_stations);
+						}
+						
+						
+						//_stations = s.concat(_stations);
+						
+						
+						
+//						if(type === "B") {
+//							
+//							
+//							var removeCount : int = 5 - removeIndex - 1;
+//							
+//							_stations = _stations.splice(removeIndex,removeCount);
+//							
+//							
+////							i = count-1;
+////							while(nCount>0){
+////								_stations.pop();
+////								_stations.splice(removeIndex,removeCount);
+////								i--;
+////								//nCount--;
+////							}
+//						}
+//						else if(type === "E") {
+//							
+//							var endIndex : Number = _trainLine.StationList.indexOf(_endStation);
+//							while(i<=endIndex){
+//								_stations.shift();
+//								_stations.push(_trainLine.StationList[i]);
+//								i++;
+//							}						
+//						}
+					}
+
+				}
+				
+				dataProvider = _stations;
+				
+				SHOW_ARRIVE_INFO = true;
+				SHOW_NEXT_INFO = false;
+
+				dispatchEvent(new Event("arrivedStation"));
+				
+			}
+			
+			private function getStations(eIndex:int,sCount:int , count:int):Array{
+				
+				var s : Array = [];
+				var sIndex : int = eIndex - sCount;
+				if(sIndex > 0) {
+					s =  _trainLine.StationList.slice(sIndex,eIndex);
+				}
+				else{
+					sIndex = Math.abs(sIndex);
+					s = _trainLine.StationList.slice(count-sIndex,count)
+					s = s.concat(_trainLine.StationList.slice(0,eIndex));
+				}
+				return s;
+			}
+			
+			
+			public function get nextStation():TrainStation
+			{
+				return _nextStation;
+			}
+			
+			public function set nextStation(value:TrainStation):void
+			{
+				_nextStation = value;
+				_arrivedStation = null;
+				
+				var count : Number = _trainLine.StationList.length;
+				var index : Number = _trainLine.StationList.indexOf(_nextStation);
+				//var _startIndex : Number = dir == Direction.UP ? index - 1 : index - 3;
+				//var _endIndex : Number = dir == Direction.UP ? index + 4 : index + 2;
+				
+				var _startIndex : Number = index - 1;
+				var _endIndex : Number = index + 4;
+				
+				
+				var _stations : Array; 
+				if(isRing)
+				{
+					var _temp : Array;
+					var joinCount : Number; 
+					if(_startIndex < 0)
+					{
+						joinCount = Math.abs(0 - _startIndex);
+						_stations = _trainLine.StationList.slice(count - joinCount,count);
+						_temp = _trainLine.StationList.slice(0,_endIndex);
+						
+						_stations = _stations.concat(_temp);
+					}
+					else if(_endIndex > count)
+					{
+						joinCount = Math.abs(count - _endIndex);
+						
+						_stations = _trainLine.StationList.slice(0,joinCount);
+						_temp = _trainLine.StationList.slice(_startIndex,count);
+						
+						_stations = _temp.concat(_stations);
+					}
+						//4 4 0 1 19 1a 1a 0 0 0 0 0 2 1 0 0
+					else
+					{
+						
+						_stations = _trainLine.StationList.slice(_startIndex,_endIndex);
+					}
+				}
+				else
+				{
+					
+					if(_startIndex < 0)
+					{
+						_startIndex = 0;
+						_endIndex = 5;
+					}
+					else if(_endIndex > count)
+					{
+						_startIndex = count - 5;
+						_endIndex = count;
+					}	
+					
+					
+					_stations = _trainLine.StationList.slice(_startIndex,_endIndex);
+					
+					if(_isLast && _endIndex == count && index > 1) {
+						_stations.shift();
+						_stations.push(_trainLine.StationList[0]);
+					}
+					
+					var removeIndex : int =  _stations.indexOf(_endStation);
+					
+					if(removeIndex > 0) {
+						
+						var removeCount : int = 5 - removeIndex - 1;
+						
+						if(removeCount>0){
+							
+							_stations.splice(removeIndex+1,removeCount);
+							
+							var eIndex : int = _trainLine.StationList.indexOf(_stations[0]);
+							_stations = getStations(eIndex,removeCount,count).concat(_stations);
+						}
+						
+					}
+					
+				}
+				
+				dataProvider = _stations;
+				
+				SHOW_ARRIVE_INFO = false;
+				SHOW_NEXT_INFO = true;
+				
+				dispatchEvent(new Event("willArriveStation"));
+//				dispatchEvent(new Event("arrivedStation"));
+				
+				
+			}
+			
+			/**
+			 * 设置起始站
+			 */
+			public function set startStation(station:TrainStation):void{
+				_startStation = station;
+//				var index:int = _trainLine.StationList.indexOf(station);
+//				if(index == -1) return;
+//				
+//				var s:int = index;
+//				var e:int = index+5;
+//				var stations:Array = [];
+//				
+//				for(var i:int = s ; i < e ; i++){
+//					stations.push(_trainLine.StationList[i]);
+//				}
+//				dataProvider = stations;
+//				
+//				var renderer:IStation = HelperUtils.getStationRenderer(_line + "_" +station.StationId + "_" + dir);
+//				
+//				if(renderer && renderer is StationRenderer){
+//					(renderer as StationRenderer).setRailVisible(false);
+//				}
+				
+//				if(i == 0 && _line == '4_2' && dir == Direction.DOWN){
+//					(renderer as StationRenderer).setRailVisible(false);
+//				}else{
+//					(renderer as StationRenderer).setRailVisible(true);
+//				}
+				
+			}
+			
+			
+			private var _dataProvider : Array;
+			
+			private var _dataProviderChanged : Boolean;
+			
+			public function get dataProvider() : Array
+			{
+				return _dataProvider;
+			}
+			
+			public function set dataProvider(value:Array):void
+			{
+				if(_dataProvider != value && value != null)
+				{
+					_dataProvider = value;
+					_dataProviderChanged = true;
+					
+					invalidateProperties();
+				}
+			}
+			
+			
+			protected override function commitProperties(): void
+			{
+				super.commitProperties();
+				
+				if(_dataProviderChanged)
+				{
+					_dataProviderChanged = false;	
+
+					destory();
+					loadLineStations();
+				}
+			}
+			
+			
+			private var cuttentIndex : int;
+			
+			private function loadLineStations() : void
+			{
+				var nums : int = _dataProvider.length;
+				var renderer : IStation;
+				var trainStaion : TrainStation;
+				
+				var isPass : Boolean = true;
+				
+				var playAnimate:Boolean = false;
+				
+				if(_arrivedStation){
+					cuttentIndex = _dataProvider.indexOf(_arrivedStation);
+					stopEffect();
+				}
+				if(_nextStation){
+					cuttentIndex = _dataProvider.indexOf(_nextStation);
+					playAnimate = true;
+				}
+				
+				
+				
+				var endIndex : int = _dataProvider.indexOf(endStation);
+				
+				//var ends : Array = _dataProvider.slice(_dataProvider.indexOf(endStation)+1);
+					
+				
+				for (var i : int = 0;i<nums;i++)
+				{
+					trainStaion = _dataProvider[i];
+					renderer = HelperUtils.getStationRenderer(_line + "_" +trainStaion.StationId + "_" + dir);
+					renderer.isUp = false;
+					
+//					renderer.isEnd = dir == Direction.UP ? i == (nums - 1) : i == 0;
+//					renderer.isStart = dir == Direction.UP ? i == 0 : i == (nums - 1);
+					
+					//renderer.isStart = i == 0;
+					//renderer.isEnd =  i == (nums - 1);
+					
+					renderer.displayMode = DisplayMode.PASS;
+					
+					if(i == cuttentIndex)
+					{
+						isPass =  false;
+//						renderer.displayMode = _arrivedStation ? DisplayMode.NEXT : DisplayMode.NORMAL;
+						renderer.displayMode = DisplayMode.NEXT;
+						if(playAnimate){
+							var curRender:StationRenderer = renderer as StationRenderer;
+							if(curRender){
+								setTimeout(function():void{
+									playEffect(curRender);
+								},1000);
+							}
+						}
+					}
+					else if( i > cuttentIndex){
+						
+						//renderer.displayMode = DisplayMode.NORMAL;	
+						
+						renderer.displayMode = trainStaion.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+					}
+//					else
+//					{
+//						if(!isLastStation)
+//						{
+//							renderer.displayMode = trainStaion.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+//							if(!isRing && endIndex != 0){
+//								if(endIndex != -1 && i > endIndex) {
+//									renderer.displayMode = isLast ? DisplayMode.NORMAL: DisplayMode.PASS;
+//								}
+//								
+//								/*if(ends.indexOf(trainStaion) != -1) {
+//								renderer.displayMode = DisplayMode.PASS;
+//								}*/
+//							}	
+//						}
+//						else
+//						{
+//							renderer.displayMode = DisplayMode.PASS;
+//						}
+//					}
+//
+//					if(isPass)
+//					{
+//						renderer.displayMode = DisplayMode.PASS;
+//					}
+					
+					contentGroup.addElement(renderer);
+				}				
+			}
+			
+			
+			private var _passStation : TrainStation;
+
+			public function set passStation(value:TrainStation):void
+			{
+				if(_dataProvider) {
+					var renderer : IStation = HelperUtils.getStationRenderer(_line + "_" +value.StationId + "_" + dir);
+					var passCuttentIndex : int = _dataProvider.indexOf(value);
+					if(passCuttentIndex > cuttentIndex)
+						renderer.displayMode = value.IsPass ? DisplayMode.PASS : DisplayMode.NORMAL;
+					
+					_passStation = value;
+				}
+			}
+			
+			
+//			
+//			private function setSkinClass(renderer : IStation) : void
+//			{
+//				var ui : UIComponent = renderer as UIComponent;
+//				
+//				
+//				var skinClass : Class = ui.getStyle("skinClass");
+//				
+//				if(skinClass)
+//					return;
+//				
+//				switch(renderer.dir)
+//				{
+//					case DisplayDir.Right : 
+//					{
+//						renderer.rails = RailUtils.nRightPoints;
+//						skinClass = Class(com.missiongroup.car.skins.ArrivedRightStationRendererSkin);
+//						break;
+//					}
+//					default :
+//					{
+//						renderer.rails = RailUtils.nRightPoints;
+//						skinClass = Class(com.missiongroup.car.skins.ArrivedLeftStationRendererSkin);
+//						break;
+//					}
+//				}	
+//				
+//				if(skinClass)
+//				{
+//					ui.setStyle('skinClass',skinClass);
+//				}
+//			}			
+//
+//			private function createItemRenderer(trainStaion : TrainStation,lineNum : String) : IStation
+//			{
+//				
+//				var key : String = trainStaion.StationId + "_" + dir;
+//				
+//				var myItemRenderer : IStation = cacheStations.find(key);				
+//				
+//				if(myItemRenderer) 
+//					return myItemRenderer;
+//				
+//				if(!myItemRenderer)
+//					myItemRenderer = new ArrivedStationRenderer();
+//				
+//				
+//				myItemRenderer.station = trainStaion;
+//				myItemRenderer.line = lineNum;
+//				myItemRenderer.userLines = HelperUtils.getUserLines(trainStaion,lineNum);
+//				myItemRenderer.dir = dir == Direction.UP ? DisplayDir.Right : DisplayDir.Left;
+//				
+//				setSkinClass(myItemRenderer);
+//				
+//				cacheStations.add(key,myItemRenderer);
+//				
+//				return myItemRenderer;
+//			}	
+			
+			private function destory() : void {
+				
+				var myItemRenderer : IStation;
+				for (var i : int = contentGroup.numElements - 1;i>=0;i--) {
+					myItemRenderer = contentGroup.removeElementAt(i) as IStation;
+					if(myItemRenderer) {
+						myItemRenderer.destroy();
+					}
+				}
+			}
+			
+			
+			private var _willArriveDir:int;
+			public function showWillArrive(dir:int):void{
+				
+				_willArriveDir = dir;
+				
+				if(dir == 1){
+					nextbg.scaleX = -1;
+					nextbg.x = nextbg.width;
+					NEXT_BG_SOURCE = 'assets/skins/next_line2.png';
+					
+					next_line_text.left = 50;
+					next_line_text.right = null;
+					
+					contentGroup.includeInLayout = false;
+					contentGroup.x = 500;
+					
+//					var frist:StationRenderer = contentGroup.getElementAt(0) as StationRenderer;
+//					if(frist){
+//						frist.displayMode = DisplayMode.NORMAL;
+//					}
+					
+				}else{
+					nextbg.scaleX = 1;
+					nextbg.x = -30;
+					NEXT_BG_SOURCE = 'assets/skins/next_line.png';
+					
+					next_line_text.left = null;
+					next_line_text.right = 50;
+					
+					contentGroup.x = -10;
+					contentGroup.includeInLayout = false;
+				}
+				
+				trace('showWillArrive');
+			}
+			
+			public function showArrive():void{
+				contentGroup.x = 0;
+				contentGroup.includeInLayout = true;
+				trace('showArrive');
+			}
+			
+			private function playEffect(sr : StationRenderer):void{
+				if(sr.railSprite)
+				{
+					sr.railSprite.fills = sr.R_COLORS;
+					
+					simple.valueFrom = 0;
+					simple.valueTo = sr.railSprite.rails.length;
+					
+					stopEffect();
+					
+					animate.duration = (sr.dir == DisplayDir.Right || sr.dir == DisplayDir.Left) ? 1000 : 2000;
+					animate.target = sr.railSprite;
+					animate.addEventListener(EffectEvent.EFFECT_END,playHandler);
+					animate.play();
+				}
+			}
+			
+			public function stopEffect() : void
+			{
+				animate.target = null;
+				animate.removeEventListener(EffectEvent.EFFECT_END,playHandler);
+				animate.stop();
+			}
+			
+			private function playHandler(event : Event) : void
+			{
+				animate.play();
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Metadata>
+		[Event(name="arrivedStation", type="flash.events.Event")]
+		[Event(name="willArriveStation", type="flash.events.Event")]
+	</fx:Metadata>
+	
+	<fx:Declarations>
+		
+		<s:Animate id="animate" duration="1000">
+			<s:motionPaths>
+				<s:SimpleMotionPath id="simple" property="index" valueBy="1" />
+			</s:motionPaths>
+		</s:Animate>
+		
+		
+	</fx:Declarations>
+	
+	
+	<s:states>
+		<s:State name="open" />
+		<s:State name="close" />
+	</s:states>
+
+	<s:BitmapImage id="arrivebg" source="assets/skins/arrived_line.png" verticalCenter="0" x="-30" visible="{SHOW_ARRIVE_INFO}" />
+	<s:BitmapImage id="nextbg" source="{NEXT_BG_SOURCE}" verticalCenter="0" x="-30" visible="{SHOW_NEXT_INFO}" />
+	
+	<s:HGroup id="next_line_text" top="20" right="50" visible="{SHOW_NEXT_INFO}">
+		<s:Group width="20" height="22">
+			<s:Rect top="0" left="0" right="0" bottom="0">
+				<s:fill>
+					<s:SolidColor color="#4F2E8B" />
+				</s:fill>
+			</s:Rect>
+			<s:Label text="4" fontSize="20" color="#ffffff" width="100%" textAlign="center" verticalAlign="middle"/>
+		</s:Group>
+		<s:Label text="号线" color="#333333" fontSize="20"/>
+	</s:HGroup>
+	
+	
+	
+	<s:Group width="100%" height="100%">
+		<s:layout>
+			<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center" gap="50" />
+		</s:layout>
+		
+		
+		<s:Group id="contentGroup" height="200" width="800">
+			<s:layout>
+				<s:HorizontalLayout verticalAlign="middle" horizontalAlign="center" />
+			</s:layout>
+		</s:Group>
+		
+		<s:BitmapImage source.close="assets/images/pic_close.png" 
+					   source.open="assets/images/pic_open.png" visible="{SHOW_ARRIVE_INFO}"/>
+		
+		
+		<s:VGroup gap="20" horizontalAlign="center" visible="{SHOW_ARRIVE_INFO}">
+			
+			<s:Label text.open="本侧下车" text.close="对面下车" 
+					 color="{_fontColor}" 
+					 fontSize="40" fontWeight="bold" />
+			
+			<s:Label text="{CHANGE_LINE_INFO}"
+					 fontSize="22"/>
+			
+			
+		</s:VGroup>
+		
+	</s:Group>
+
+	
+	
+</s:Group>
+

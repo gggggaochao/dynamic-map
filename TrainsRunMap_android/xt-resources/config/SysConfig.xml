@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<configuration>
+
+	<!-- 系统参数配置 -->	
+	<system>
+		<name>TSIS</name>
+	    <title>列车到站指示系统</title>
+	    <subtitle>Train station indicator system</subtitle>
+	    <version>Copyright © 2005-2012 上海鸣啸信息科技发展有限公司 All Rights Reserved 软件测试中,更新时间2012.09.13 版本号3.0 Beta</version>
+	</system>
+	
+</configuration>
+
+
+
+
+
+
